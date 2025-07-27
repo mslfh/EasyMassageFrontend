@@ -14,7 +14,7 @@
         </div>
       </q-card-section>
       <q-card-section class="q-pa-lg">
-        <div>
+        <div class="q-mb-md">
           <q-select
             v-model="formData.selectedStaff"
             :options="staffList"
@@ -31,6 +31,20 @@
               <q-icon name="person" color="grey-6" />
             </template>
           </q-select>
+
+           <q-input
+            dense
+            v-if="formData.selectedStaff && formData.selectedStaff.description"
+            readonly
+             autogrow
+            v-model="formData.selectedStaff.description"
+            class="q-mr-xs q-ml-xs"
+            input-class="text-grey-6"
+          >
+            <template v-slot:prepend>
+              <q-icon name="info" color="grey-6" size="xs" />
+            </template>
+          </q-input>
         </div>
 
         <div class="row q-gutter-md q-mb-md">
@@ -154,8 +168,8 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  duration: 3,
-  startTime: "",
+  duration: 8,
+  startTime: "09:00",
 });
 
 const emit = defineEmits<Emits>();
@@ -171,14 +185,15 @@ const formData = ref({
   start_time: "",
   end_time: "",
   remark: "",
-  duration: 3,
+  duration: 8,
 });
 
 const durationOptions = [
-  { label: "2h", value: 2 },
-  { label: "2.5h", value: 2.5 },
-  { label: "3h", value: 3 },
-  { label: "3.5h", value: 3.5 },
+  { label: "8h", value: 8 },
+  { label: "8.5h", value: 8.5 },
+  { label: "9h", value: 9 },
+  { label: "9.5h", value: 9.5 },
+  { label: "10h", value: 10 },
 ];
 
 function formatDateTitle(dateString: string) {

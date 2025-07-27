@@ -80,7 +80,18 @@
           >
             <div>Total Price:</div>
             <q-space />
-            <q-span>$ {{ finishAppointmentDialog.event.service_price }}</q-span>
+            <div class="row items-center q-gutter-xs">
+              <q-span>$ {{ editablePrice }}</q-span>
+              <q-btn
+                size="sm"
+                flat
+                dense
+                icon="edit"
+                color="primary"
+                @click="showEditPriceDialog"
+                class="q-ml-xs"
+              />
+            </div>
           </q-card-section>
           <div class="text-weight-bold text-grey-9 q-mt-md">Payment Method</div>
           <q-card-section class="text-weight-bold text-grey-7">
@@ -110,7 +121,7 @@
                   , Unpaid: ${{
                     Math.max(
                       0,
-                      finishAppointmentDialog.event.service_price -
+                      editablePrice -
                         finishAppointmentDialog.splitPayments.reduce(
                           (sum, payment) => sum + (payment.amount || 0),
                           0
@@ -201,8 +212,7 @@
                 Voucher valid.
                 <div
                   :class="
-                    voucherInfo.remaining_amount <
-                    finishAppointmentDialog.event.service_price
+                    voucherInfo.remaining_amount < editablePrice
                       ? 'text-red-4'
                       : ''
                   "
@@ -336,6 +346,9 @@ const voucherCode = ref("");
 const voucherVerified = ref(false);
 const voucherInfo = ref(null as null | { remaining_amount: number });
 const voucherError = ref("");
+const editablePrice = ref(0);
+const showPriceEditDialog = ref(false);
+const tempPrice = ref(0);
 
 onMounted(() => {
   const start_time = new Date();
@@ -343,6 +356,7 @@ onMounted(() => {
   const minutes = String(start_time.getMinutes()).padStart(2, "0");
   const formattedTime = `${hours}:${minutes}`;
   finishAppointmentDialog.value.event = props.event;
+  editablePrice.value = props.event.service_price;
   if (props.event.actual_start_time) {
     finishAppointmentDialog.value.actual_start_time =
       props.event.actual_start_time;
@@ -361,8 +375,7 @@ function handlePaymentMethodChange(value: string) {
   } else if (value === "split_payment") {
     finishAppointmentDialog.value.splitPayments = [{ method: "", amount: 0 }];
   } else {
-    finishAppointmentDialog.value.paymentAmount =
-      finishAppointmentDialog.value.event.service_price;
+    finishAppointmentDialog.value.paymentAmount = editablePrice.value;
     finishAppointmentDialog.value.splitPayments = [];
   }
 }
@@ -375,6 +388,48 @@ function removeSplitPayment(index: number) {
   finishAppointmentDialog.value.splitPayments.splice(index, 1);
 }
 
+function showEditPriceDialog() {
+  tempPrice.value = editablePrice.value;
+  $q.dialog({
+    title: "Edit Total Price",
+    message: "Are you sure you want to edit the total price?",
+    prompt: {
+      model: tempPrice.value.toString(),
+      type: "number",
+      label: "New Total Price ($)",
+    },
+    cancel: true,
+    persistent: true,
+  })
+    .onOk((data) => {
+      const newPrice = parseFloat(data);
+      if (newPrice > 0) {
+        editablePrice.value = newPrice;
+        // Update payment amount if not split payment
+        if (finishAppointmentDialog.value.paymentMethod !== "split_payment" &&
+            finishAppointmentDialog.value.paymentMethod !== "unpaid") {
+          finishAppointmentDialog.value.paymentAmount = newPrice;
+        }
+        $q.notify({
+          type: "positive",
+          message: `Total price updated to $${newPrice}`,
+          position: "top",
+          timeout: 2000,
+        });
+      } else {
+        $q.notify({
+          type: "negative",
+          message: "Please enter a valid price greater than 0",
+          position: "top",
+          timeout: 2000,
+        });
+      }
+    })
+    .onCancel(() => {
+      console.log("Price edit cancelled");
+    });
+}
+
 async function verifyVoucher() {
   voucherError.value = "";
   voucherVerified.value = false;
@@ -382,8 +437,7 @@ async function verifyVoucher() {
   if (!voucherCode.value) return;
   try {
     const amount =
-      finishAppointmentDialog.value.paymentAmount ||
-      finishAppointmentDialog.value.event.service_price;
+      finishAppointmentDialog.value.paymentAmount || editablePrice.value;
     const res = await api.post("/api/vouchers/verify", {
       code: voucherCode.value,
       amount: amount,
@@ -442,7 +496,7 @@ async function confirmFinishAppointment() {
       finishAppointmentDialog.value.splitPayments.reduce(
         (sum, payment) => sum + payment.amount,
         0
-      ) !== finishAppointmentDialog.value.event.service_price
+      ) !== editablePrice.value
     ) {
       $q.notify({
         type: "negative",
@@ -473,7 +527,7 @@ async function confirmFinishAppointment() {
   const payload = {
     appointment_id: finishAppointmentDialog.value.event.appointment_id,
     order_status: finishAppointmentDialog.value.status,
-    total_amount: finishAppointmentDialog.value.event.service_price,
+    total_amount: editablePrice.value,
     actual_start_time:
       props.selectedDate +
       " " +

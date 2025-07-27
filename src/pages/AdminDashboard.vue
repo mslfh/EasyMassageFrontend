@@ -4,9 +4,7 @@
     <div class="row q-col-gutter-lg">
       <!-- Statistics Card with Carousel -->
       <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-        <q-card
-          class="fit shadow-1 overflow-hidden"
-        >
+        <q-card class="fit shadow-1 overflow-hidden">
           <q-carousel
             v-model="currentStatSlide"
             transition-prev="slide-right"
@@ -19,47 +17,82 @@
             :autoplay="5000"
             height="100%"
             class="text-white rounded-borders"
-            style=" background: #7165ec;"
+            style="background: #7165ec"
           >
-            <!-- Slide 1: Site Performance -->
-            <q-carousel-slide name="performance" class="column no-wrap q-pa-none">
-              <div class="q-pa-lg fit">
+            <!-- Slide 1: Service Performance -->
+            <q-carousel-slide
+              name="performance"
+              class="column no-wrap q-pa-none"
+            >
+              <div class="q-pa-lg fit" style="position: relative">
+                <q-btn
+                  flat
+                  round
+                  icon="more_vert"
+                  style="
+                    position: absolute;
+                    top: 16px;
+                    right: 16px;
+                    z-index: 10;
+                  "
+                  color="white"
+                />
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
                       <div class="text-h4 text-white q-mb-xs">
                         Service Performance
                       </div>
-                      <div class="text-subtitle1 text-white" style="opacity: 0.8;">
-                        The conversion rate is a total of {{ appointmentConversionRate }}%.
+                      <div
+                        class="text-subtitle1 text-white"
+                        style="opacity: 0.8"
+                      >
+                        The recent service performance metrics
                       </div>
                     </div>
 
                     <div class="q-mt-md">
-                      <div class="text-h5 text-white q-mb-md">Spending</div>
+                      <div class="text-h5 text-white q-mb-md">Top</div>
                       <div class="row q-gutter-lg">
                         <div class="col">
-                          <div class="text-h6 text-white">
-                            {{ todayStatistics.total_appointments }}h
+                          <div class="text-h6 text-white  q-mb-md">
+                            {{ serviceStatistics.top_staff }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
-                            Spend
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Top Staff
                           </div>
-                          <div class="text-body2 text-white q-mt-sm">
-                            {{ todayStatistics.appointmentGroup?.finished || 0 }}
+                          <div class="text-body2 text-white q-mt-sm ">
+                            {{ serviceStatistics.top_staff_appointments }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
-                            Order
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Staff's appointments
                           </div>
                         </div>
+
                         <div class="col">
-                          <div class="text-h6 text-white">110</div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
-                            Order Size
+                          <div class="text-body1 text-white">
+                            {{ serviceStatistics.top_services }}
                           </div>
-                          <div class="text-body2 text-white q-mt-sm">28k</div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
-                            Items
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Top Services
+                          </div>
+                          <div class="text-body2 text-white q-mt-sm">
+                            {{ serviceStatistics.top_services_count }}
+                          </div>
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Services Completed
                           </div>
                         </div>
                       </div>
@@ -77,15 +110,33 @@
             </q-carousel-slide>
 
             <!-- Slide 2: Appointment Statistics -->
-            <q-carousel-slide name="appointments" class="column no-wrap q-pa-none">
-              <div class="q-pa-lg fit">
+            <q-carousel-slide
+              name="appointments"
+              class="column no-wrap q-pa-none"
+            >
+              <div class="q-pa-lg fit" style="position: relative">
+                <q-btn
+                  flat
+                  round
+                  icon="more_vert"
+                  style="
+                    position: absolute;
+                    top: 16px;
+                    right: 16px;
+                    z-index: 10;
+                  "
+                  color="white"
+                />
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
                       <div class="text-h4 text-white q-mb-xs">
                         Appointment Statistics
                       </div>
-                      <div class="text-subtitle1 text-white" style="opacity: 0.8;">
+                      <div
+                        class="text-subtitle1 text-white"
+                        style="opacity: 0.8"
+                      >
                         Updated {{ formatUpdateTime() }}
                       </div>
                     </div>
@@ -99,27 +150,41 @@
                           <div class="text-h6 text-white">
                             {{ todayStatistics.total_appointments }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Total Appointments
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
                             ${{ todayStatistics.total_revenue.toFixed(0) }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Revenue
                           </div>
                         </div>
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{ todayStatistics.appointmentGroup?.finished || 0 }}
+                            {{
+                              todayStatistics.appointmentGroup?.finished || 0
+                            }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Completed
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
                             {{ todayStatistics.appointmentGroup?.booked || 0 }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Pending
                           </div>
                         </div>
@@ -128,7 +193,7 @@
                   </div>
                   <div class="col-5 flex flex-center">
                     <q-img
-                      src="../assets/sidebar-dashboard.png"
+                      src="../assets/sidebar-dashboard-2.png"
                       style="max-width: 200px; max-height: 200px"
                       class="appointment-image"
                     />
@@ -139,14 +204,29 @@
 
             <!-- Slide 3: Revenue Analytics -->
             <q-carousel-slide name="revenue" class="column no-wrap q-pa-none">
-              <div class="q-pa-lg fit">
+              <div class="q-pa-lg fit" style="position: relative">
+                <q-btn
+                  flat
+                  round
+                  icon="more_vert"
+                  style="
+                    position: absolute;
+                    top: 16px;
+                    right: 16px;
+                    z-index: 10;
+                  "
+                  color="white"
+                />
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
                       <div class="text-h4 text-white q-mb-xs">
                         Revenue Analytics
                       </div>
-                      <div class="text-subtitle1 text-white" style="opacity: 0.8;">
+                      <div
+                        class="text-subtitle1 text-white"
+                        style="opacity: 0.8"
+                      >
                         Financial performance overview
                       </div>
                     </div>
@@ -160,13 +240,19 @@
                           <div class="text-h6 text-white">
                             ${{ todayStatistics.total_revenue.toFixed(0) }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Total Revenue
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
                             ${{ todayStatistics.total_paid?.toFixed(0) || 0 }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Paid Amount
                           </div>
                         </div>
@@ -174,13 +260,19 @@
                           <div class="text-h6 text-white">
                             {{ topPaymentMethods.length }}
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Payment Methods
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
                             {{ topPaymentMethodPercentage.toFixed(1) }}%
                           </div>
-                          <div class="text-body2 text-white" style="opacity: 0.8;">
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
                             Paid Rate
                           </div>
                         </div>
@@ -189,7 +281,7 @@
                   </div>
                   <div class="col-5 flex flex-center">
                     <q-img
-                      src="../assets/sidebar-dashboard.png"
+                      src="../assets/sidebar-dashboard-3.png"
                       style="max-width: 200px; max-height: 200px"
                       class="revenue-image"
                     />
@@ -229,13 +321,13 @@
             ${{ todayStatistics.total_revenue.toFixed(2) }}
           </div>
           <div class="text-subtitle2 text-grey-5 q-mb-md">Sale Amount</div>
-          <div style="height: 100px; overflow: hidden;">
+          <div style="height: 120px; overflow: hidden">
             <!-- Appointments line chart in this week -->
             <ApexCharts
               type="area"
               :options="AppointmentWeekChartOptions"
               :series="AppointmentWeekSeries"
-              height="100"
+              height="120"
             />
           </div>
         </q-card>
@@ -245,12 +337,12 @@
       <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
         <q-card class="fit bg-white q-pa-lg shadow-1">
           <div class="row items-center q-mb-xs">
-            <div class="text-h6 text-grey-6">Sales Summary</div>
-            <div class="text-orange-6 text-weight-bold q-ml-auto">+18.2%</div>
+            <div class="text-h6 text-grey-6">Revenue Summary</div>
+            <!-- <div class="text-orange-6 text-weight-bold q-ml-auto">+18.2%</div> -->
           </div>
 
           <div class="text-h4 text-weight-bold text-grey-5">
-            ${{ todayStatistics.total_revenue.toFixed(2) }}
+            ${{ todayStatistics.total_paid.toFixed(2) }}
           </div>
 
           <!-- Payment Methods Grid -->
@@ -355,6 +447,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="q-mb-md flex items-center">
                 <div
                   class="bg-deep-purple-1 flex flex-center"
@@ -370,12 +463,27 @@
                   <div class="text-body1 text-grey-6">Pending</div>
                   <div class="text-caption text-grey-5">
                     {{ todayStatistics.appointmentGroup?.booked || 0 }}
-                    Open Appointments
+                    Pending Appointments
+                  </div>
+                </div>
+              </div>
+              <div class="q-mb-md flex items-center">
+                <div
+                  class="bg-blue-1 flex flex-center"
+                  style="width: 40px; height: 40px; border-radius: 12px"
+                >
+                  <q-icon name="o_timer" color="blue-5" size="24px" />
+                </div>
+                <div class="q-ml-md">
+                  <div class="text-body1 text-grey-6">In Progress</div>
+                  <div class="text-caption text-grey-5">
+                    {{ todayStatistics.appointmentGroup?.in_progress || 0 }}
+                    Appointments
                   </div>
                 </div>
               </div>
 
-              <div class="flex items-center">
+              <div class="q-mb-md flex items-center">
                 <div
                   class="bg-red-1 flex flex-center"
                   style="width: 40px; height: 40px; border-radius: 12px"
@@ -386,6 +494,22 @@
                   <div class="text-body1 text-grey-6">No Show</div>
                   <div class="text-caption text-grey-5">
                     {{ todayStatistics.appointmentGroup?.pending || 0 }}
+                    Appointments
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center">
+                <div
+                  class="bg-deep-orange-1 flex flex-center"
+                  style="width: 40px; height: 40px; border-radius: 12px"
+                >
+                  <q-icon name="o_delete" color="deep-orange-5" size="24px" />
+                </div>
+                <div class="q-ml-md">
+                  <div class="text-body1 text-grey-6">Cancelled</div>
+                  <div class="text-caption text-grey-5">
+                    {{ todayStatistics.appointmentGroup?.cancelled || 0 }}
                     Appointments
                   </div>
                 </div>
@@ -610,7 +734,7 @@
       </div>
 
       <!-- Sales by Staff Card -->
-      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+      <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <q-card
           class="col bg-white q-pa-lg shadow-1 card-min"
           style="border-radius: 20px"
@@ -660,7 +784,7 @@
       </div>
 
       <!-- Monthly Appointment Performance Card -->
-      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+      <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <q-card
           class="col bg-white q-pa-lg shadow-1 card-min"
           style="border-radius: 20px"
@@ -710,6 +834,11 @@
 import { ref, computed, onMounted } from "vue";
 import { api } from "boot/axios";
 import ApexCharts from "vue3-apexcharts";
+import {
+  getUserRole,
+} from "../utils/auth";
+
+const userRole = ref("");
 
 const AppointmentTrackerchartOptions = {
   chart: {
@@ -865,16 +994,16 @@ const StaffEarningsBarSeries = computed(() => [
 const AppointmentWeekChartOptions = {
   chart: {
     type: "area",
-    height: 100,
+    height: 120,
     width: "100%",
     sparkline: {
-      enabled: true
+      enabled: true,
     },
     toolbar: {
-      show: false
+      show: false,
     },
     zoom: {
-      enabled: false
+      enabled: false,
     },
     dropShadow: {
       enabled: true,
@@ -882,14 +1011,14 @@ const AppointmentWeekChartOptions = {
       left: 0,
       blur: 3,
       opacity: 0.2,
-      color: "#3bcc7c"
-    }
+      color: "#3bcc7c",
+    },
   },
   stroke: {
     curve: "smooth",
     width: 2.5,
     colors: ["#3bcc7c"],
-    lineCap: "round"
+    lineCap: "round",
   },
   fill: {
     type: "gradient",
@@ -900,14 +1029,14 @@ const AppointmentWeekChartOptions = {
       inverseColors: false,
       opacityFrom: 0.5,
       opacityTo: 0.1,
-      stops: [0, 90, 100]
-    }
+      stops: [0, 90, 100],
+    },
   },
   markers: {
     size: 0,
     hover: {
-      size: 0
-    }
+      size: 0,
+    },
   },
   grid: {
     show: false,
@@ -915,56 +1044,63 @@ const AppointmentWeekChartOptions = {
       top: -10,
       right: 5,
       bottom: -10,
-      left: 5
-    }
+      left: 5,
+    },
   },
   xaxis: {
     labels: {
-      show: false
+      show: false,
     },
     axisBorder: {
-      show: false
+      show: false,
     },
     axisTicks: {
-      show: false
+      show: false,
     },
     crosshairs: {
-      show: false
-    }
+      show: false,
+    },
   },
   yaxis: {
     labels: {
-      show: false
+      show: false,
     },
-    min: 0
+    min: 0,
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   legend: {
-    show: false
+    show: false,
   },
   tooltip: {
     enabled: true,
-    theme: 'light',
+    theme: "light",
     style: {
-      fontSize: '12px',
-      fontFamily: 'Inter, sans-serif'
+      fontSize: "12px",
+      fontFamily: "Inter, sans-serif",
     },
-    custom: function({ series, seriesIndex, dataPointIndex }) {
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      return '<div style="background: #1f2937; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">' +
-        '<span>' + days[dataPointIndex] + ': ' + series[seriesIndex][dataPointIndex] + ' appointments</span>' +
-        '</div>';
-    }
-  }
+    custom: function ({ series, seriesIndex, dataPointIndex }) {
+      const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      return (
+        '<div style="background: #1f2937; color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">' +
+        "<span>" +
+        days[dataPointIndex] +
+        ": " +
+        series[seriesIndex][dataPointIndex] +
+        " appointments</span>" +
+        "</div>"
+      );
+    },
+  },
 };
-const AppointmentWeekSeries = [
+
+const AppointmentWeekSeries = ref([
   {
     name: "Appointments",
-    data: [8, 15, 12, 22, 28, 20, 14],
+    data: [0, 0, 0, 0, 0, 0, 0],
   },
-];
+]);
 
 const countries = [
   {
@@ -1273,7 +1409,40 @@ const formatUpdateTime = () => {
 onMounted(() => {
   fetchTodayStatistics();
   fetchStaffIncomeStatistics();
+  fetchServiceStatistics();
+  userRole.value = getUserRole();
 });
+
+const serviceStatistics = ref({
+  top_services: "",
+  top_services_count: 0,
+  top_staff: "",
+  top_staff_appointments: 0,
+});
+
+const startDate = ref("");
+const endDate = ref("");
+
+async function fetchServiceStatistics() {
+  startDate.value = new Date();
+  endDate.value = new Date();
+  startDate.value.setDate(startDate.value.getDate() - 30); // 30 days ago
+  endDate.value.setDate(endDate.value.getDate()); // Today
+  try {
+    const response = await api.get("/api/getServiceStatistics", {
+      params: {
+        start_date: startDate.value.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+        end_date: endDate.value.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+      },
+    });
+    if (response.data) {
+      serviceStatistics.value = response.data;
+      console.log("Service statistics:", serviceStatistics.value);
+    }
+  } catch (error) {
+    console.error("Error fetching service statistics:", error);
+  }
+}
 
 async function fetchTodayStatistics() {
   try {
@@ -1288,7 +1457,8 @@ async function fetchTodayStatistics() {
         orderGroup: response.data.orderGroup || null,
       };
       console.log("Today's statistics:", todayStatistics.value);
-      //AppointmentTrackerSeries computed by the finished appointments / total appointments
+
+      // Update AppointmentTrackerSeries
       AppointmentTrackerSeries.value = [
         response.data.appointmentGroup?.finished
           ? (
@@ -1298,6 +1468,17 @@ async function fetchTodayStatistics() {
             ).toFixed(2)
           : 0,
       ];
+
+      // Update AppointmentWeekSeries with real data
+      if (response.data.weekAppointmentsCount) {
+        const weekData = response.data.weekAppointmentsCount;
+        AppointmentWeekSeries.value = [
+          {
+            name: "Appointments",
+            data: weekData,
+          },
+        ];
+      }
     }
   } catch (error) {
     console.error("Error fetching today's statistics:", error);

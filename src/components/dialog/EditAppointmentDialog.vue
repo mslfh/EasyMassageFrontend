@@ -529,8 +529,8 @@ async function deleteAppointment() {
       persistent: true,
     })
       .onOk(async () => {
-        const response = await api.delete(
-          `/api/appointments/${editEventForm.value.appointment_id}`
+        const response = await api.post(
+          `/api/appointments/cancel/${editEventForm.value.appointment_id}`
         );
 
         if (response.status === 200) {

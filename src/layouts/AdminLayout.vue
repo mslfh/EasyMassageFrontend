@@ -8,6 +8,8 @@ import { fetchUserFromSearch } from "../composables/useUserFromSearch";
 import CustomerHistoryTimeline from "components/CustomerHistoryTimeline.vue";
 import { api } from "boot/axios";
 import AddAppointmentDialog from "components/dialog/AddAppointmentDialog.vue";
+import SendSmsDialog from "components/dialog/SendSmsDialog.vue";
+import { useNotificationStore } from "../stores/NotificationStore";
 import {
   getCurrentUser,
   getUserRole,
@@ -21,18 +23,24 @@ const leftDrawerOpen = ref(false);
 const zoomDrawer = ref(false);
 const $q = useQuasar();
 
+// Notification store
+const notificationStore = useNotificationStore();
+
 // User role management
 const currentUser = ref(null);
 const userRole = ref("");
 
 // Get current user info from localStorage
-onMounted(() => {
+onMounted(async () => {
   currentUser.value = getCurrentUser();
   console.log("Current User:", currentUser.value);
   userRole.value = getUserRole();
   console.log("User Role:", userRole.value);
   console.log("Is Admin or Desk:", canAccessAllMenus());
   console.log("Is Staff Only:", canOnlyAccessSchedule());
+
+  // Load initial messages for today
+  await notificationStore.fetchMessages();
 });
 
 // Computed properties for role-based visibility
@@ -94,6 +102,11 @@ function getUserInitials() {
 
   // Otherwise just get first letter
   return name.charAt(0).toUpperCase();
+}
+
+// Handle date change for messages
+async function handleDateChange(newDate) {
+  await notificationStore.changeDateAndFetch(newDate);
 }
 </script>
 
@@ -201,26 +214,28 @@ function getUserInitials() {
           >
           </q-btn>
           <q-btn
-            v-if="false"
+            v-if="true"
             round
             dense
             flat
             color="grey-8"
             icon="notifications"
           >
-            <q-badge color="red" text-color="white" floating> 5 </q-badge>
+            <q-badge color="red" text-color="white" floating>
+              {{ notificationStore.getMessages.length }}
+            </q-badge>
             <q-menu>
+              <!-- balance show -->
+              <div class="q-mt-md text-center text-weight-bold text-grey-8">
+                SMS Balance:  {{ notificationStore.getSmsBalance }}
+              </div>
               <q-list style="min-width: 100px">
-                <messages></messages>
-                <q-card class="text-center no-shadow no-border">
-                  <q-btn
-                    label="View All"
-                    style="max-width: 120px !important"
-                    flat
-                    dense
-                    class="text-indigo-8"
-                  ></q-btn>
-                </q-card>
+                <messages
+                  :messages="notificationStore.getMessages"
+                  :selected-date="notificationStore.getCurrentDate"
+                  :loading="notificationStore.isLoading"
+                  @date-change="handleDateChange"
+                ></messages>
               </q-list>
             </q-menu>
           </q-btn>
@@ -263,9 +278,13 @@ function getUserInitials() {
       >
         <q-list>
           <!-- Dashboard - Only for Admin and Desk -->
-          <q-item
+          <!-- <q-item
             v-if="isAdminOrDesk"
             to="/admin/dashboard"
+            active-class="q-item-no-link-highlighting"
+          > -->
+          <q-item
+            v-if="isAdminOrDesk"
             active-class="q-item-no-link-highlighting"
           >
             <q-item-section avatar>
@@ -287,6 +306,20 @@ function getUserInitials() {
             </q-item-section>
             <q-item-section>
               <q-item-label>Appointment</q-item-label>
+            </q-item-section>
+          </q-item>
+
+           <!-- Appointment Log - Only for Admin and Desk -->
+          <q-item
+            v-if="isAdminOrDesk"
+            to="/admin/appointment/log"
+            active-class="q-item-no-link-highlighting"
+          >
+            <q-item-section avatar>
+              <q-icon name="o_browse_gallery" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Log</q-item-label>
             </q-item-section>
           </q-item>
 

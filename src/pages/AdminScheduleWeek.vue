@@ -34,6 +34,7 @@
         view="week"
         animated
         bordered
+        :weekdays="[1, 2, 3, 4, 5, 6, 0]"
         transition-next="slide-left"
         transition-prev="slide-right"
         no-active-date
@@ -171,7 +172,8 @@ import ScheduleStaffSetDialog from "src/components/dialog/ScheduleStaffSetDialog
 import { getCurrentUser, getUserRole, canAccessAllMenus } from "../utils/auth";
 
 const calendar = ref<QCalendarDay>();
-const selectedDate = ref(today());
+// Default to the first day of the month
+const selectedDate = ref( today());
 
 // User role management
 const currentUser = ref(null);
@@ -179,10 +181,13 @@ const userRole = ref("");
 const isAdminOrDesk = ref(false);
 
 const weekStart = computed(() => {
+  // Calculate the start Monday of the week based on selected date
   const date = new Date(selectedDate.value);
   const day = date.getDay();
+  const diff = (day + 6) % 7; // Adjust to get Monday
   const start = new Date(date);
-  start.setDate(date.getDate() - day);
+  start.setDate(date.getDate() - diff +1);
+  start.setHours(0, 0, 0, 0); // Set to start of the day
   return start;
 });
 
@@ -203,9 +208,9 @@ const selectedEvent = ref({});
 
 const quickSchedule = ref({
   work_date: "",
-  start_time: "",
+  start_time: "09:00",
   remark: "",
-  duration: 3,
+  duration: 8,
 });
 
 function formatDateTitle(dateString) {

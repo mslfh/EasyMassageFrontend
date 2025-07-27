@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-sm bg-white schedule-day-view">
-     <div class="row items-center justify-between">
+    <div class="row items-center justify-between">
       <q-btn
         v-if="isAdminOrDesk"
         :dense="$q.screen.lt.md"
@@ -18,19 +18,12 @@
 
     <navigation-bar @today="onToday" @prev="onPrev" @next="onNext" />
 
-
     <!-- Quick Add Tip -->
     <div v-if="isAdminOrDesk" class="text-center q-mb-sm">
-      <q-chip
-        color="grey-1"
-        text-color="grey-8"
-        icon="info"
-        class="tip-chip"
-      >
+      <q-chip color="grey-1" text-color="grey-8" icon="info" class="tip-chip">
         Click on header or intervals to quickly add schedules
       </q-chip>
     </div>
-
 
     <div class="calendar-container">
       <q-calendar-day
@@ -46,8 +39,8 @@
         :interval-start="62"
         :interval-count="64"
         :interval-height="$q.screen.lt.md ? 10 : 12"
-        @click-head-day=" onClickHeadDay "
-        @click-time=" onClickTime "
+        @click-head-day="onClickHeadDay"
+        @click-time="onClickTime"
         class="calendar-day"
       >
         <template #head-day-event="{ scope: { timestamp } }">
@@ -109,7 +102,7 @@
               :class="badgeClasses(event)"
               :style="[
                 badgeStyles(event, timeStartPos, timeDurationHeight),
-                !isAdminOrDesk ? 'cursor: default;' : 'cursor: pointer;'
+                !isAdminOrDesk ? 'cursor: default;' : 'cursor: pointer;',
               ]"
               @click="isAdminOrDesk ? openEventDialog(event) : null"
             >
@@ -174,7 +167,6 @@ import ScheduleQuickSetDayDialog from "src/components/dialog/ScheduleQuickSetDay
 import ScheduleStaffSetDialog from "src/components/dialog/ScheduleStaffSetDialog.vue";
 import { getCurrentUser, getUserRole, canAccessAllMenus } from "../utils/auth";
 
-
 const calendar = ref<QCalendarDay>();
 const selectedDate = ref(today());
 
@@ -197,9 +189,9 @@ const selectedEvent = ref({});
 
 const quickSchedule = ref({
   work_date: "",
-  start_time: "",
+  start_time: "09:00",
   remark: "",
-  duration: 3,
+  duration: 8,
 });
 
 const currentMonth = computed(() => {
@@ -360,7 +352,7 @@ async function fetchSchedules() {
 
     // If user is staff, only fetch their own schedules
     if (!isAdminOrDesk.value && currentUser.value) {
-      params.staff_id =  currentUser.value.staff?.id;
+      params.staff_id = currentUser.value.staff?.id;
     }
 
     const response = await api.get("/api/getStaffSchedule", { params });
@@ -417,10 +409,10 @@ async function saveSchedule(payload) {
 
 function badgeClasses(event: Event) {
   return {
-    [`text-white bg-${event.bgcolor}`]: event.status !== 'inactive',
-    "text-grey-2 bg-grey-5": event.status === 'inactive',
+    [`text-white bg-${event.bgcolor}`]: event.status !== "inactive",
+    "text-grey-2 bg-grey-5": event.status === "inactive",
     "rounded-border": true,
-    "inactive-event": event.status === 'inactive',
+    "inactive-event": event.status === "inactive",
   };
 }
 
@@ -431,12 +423,7 @@ function badgeStyles(
 ): Record<string, string> {
   const s: Record<string, string> = {};
 
-  if (
-    timeStartPos &&
-    timeDurationHeight &&
-    event.time &&
-    event.duration
-  ) {
+  if (timeStartPos && timeDurationHeight && event.time && event.duration) {
     const baseTop = timeStartPos(event.time);
     const baseHeight = timeDurationHeight(event.duration);
 
@@ -458,7 +445,7 @@ function badgeStyles(
     ) {
       const columnWidth = availableWidth / event.totalColumns;
       s.width = `${columnWidth - 0.5}%`; // Slight gap between columns
-      s.left = `${leftMargin + (event.column * columnWidth)}%`;
+      s.left = `${leftMargin + event.column * columnWidth}%`;
     } else {
       s.width = `${availableWidth}%`; // Leave 10% space (5% on each side) for easier time interval clicking
       s.left = `${leftMargin}%`; // Center the event with margin on both sides
@@ -785,7 +772,6 @@ watch(selectedDate, () => {
   text-decoration: line-through;
   position: relative;
 }
-
 
 .schedule-day-view .inactive-event .event-title,
 .schedule-day-view .inactive-event .event-start-time,

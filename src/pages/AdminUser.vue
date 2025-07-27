@@ -59,13 +59,15 @@
       </template>
 
       <template v-slot:body-cell-profile="props">
-          <q-td >
-            <AttachmentViewer
-              :attachments="
-                  props.row.user_profile ?props.row.user_profile.medical_attachment_path:  ''
-              "
-            />
-          </q-td>
+        <q-td>
+          <AttachmentViewer
+            :attachments="
+              props.row.user_profile
+                ? props.row.user_profile.medical_attachment_path
+                : ''
+            "
+          />
+        </q-td>
       </template>
     </q-table>
     <q-btn
@@ -107,14 +109,8 @@
           <q-input v-model="editForm.name" label="Username" />
           <q-input v-model="editForm.first_name" label="First Name" />
           <q-input v-model="editForm.last_name" label="Last Name" />
-          <q-input
-            filled
-            v-model="editForm.email"
-            label="Email"
-            type="email"
-            readonly
-          />
           <q-input v-model="editForm.phone" label="Phone" />
+          <q-input v-model="editForm.email" label="Email" type="email" />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
@@ -306,7 +302,6 @@ const fetchUsers = async (startRow, count, filter, sortBy, descending) => {
     }));
     pagination.value.rowsNumber = response.data?.total || 0;
     loading.value = false;
-
   } catch (error) {
     console.error("Error fetching users:", error);
     users.value = [];
@@ -449,5 +444,4 @@ const fetchCustomerHistory = async (userId) => {
   });
   isHistoryDialogOpen.value = true;
 };
-
 </script>

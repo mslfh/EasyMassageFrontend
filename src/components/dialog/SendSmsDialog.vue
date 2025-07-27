@@ -107,14 +107,22 @@ const props = defineProps({
   editEventForm: {
     type: Object,
     required: true,
+    default: () => ({
+      customer_name: "",
+      customer_phone: "",
+      booking_time: "09:00",
+    }),
   },
   selectedDate: {
     type: String,
     required: true,
+    default: () => new Date().toISOString().split("T")[0],
   },
+
   reminder_msg_template: {
     type: String,
     required: true,
+    default: "",
   }
 });
 
@@ -136,10 +144,12 @@ onMounted(() => {
   sendSmsDialog.value.schedule_time =
     props.selectedDate + " " + props.editEventForm.booking_time + ":00";
 
-  sendSmsDialog.value.message = formatMassage(
-    props.reminder_msg_template,
-    props.editEventForm
-  );
+    if(sendSmsDialog.value.phone !== "") {
+      sendSmsDialog.value.message = formatMassage(
+        props.reminder_msg_template,
+        props.editEventForm
+      );
+    }
 });
 
 function formatMassage(

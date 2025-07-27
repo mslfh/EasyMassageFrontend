@@ -1043,7 +1043,7 @@ const submitAppointment = async () => {
   } catch (error) {
     step.value = 1;
     $q.notify({
-      message: "Sorry! Failed to book, please call us to check.",
+      message: "Sorry! No available staff for the selected time, please rebook or call us to check.",
       color: "red",
       icon: "error",
       position: "top",

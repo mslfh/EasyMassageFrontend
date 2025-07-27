@@ -338,6 +338,19 @@
                     >
                       Check Out
                     </q-chip>
+
+                    <q-chip
+                      size="10px"
+                      class="shadow-up-2"
+                      text-color="blue-1"
+                      icon="o_event_repeat"
+                      clickable
+                      @click.stop="rebookAppointment(event)"
+                      outline
+                    >
+                      Rebook
+                    </q-chip>
+
                     <q-item-label
                       class="text-subtitle comment-ellipsis"
                       v-if="event.comments"
@@ -403,6 +416,7 @@
     :selectedTime="selectedTime"
     :staffOptions="staffOptions"
     :serviceOptions="serviceOptions"
+    :selectedUser="selectedUser"
     @close="showAddEventDialog = false"
     @addBreakEvent="handleAddBreakEvent"
     @save="
@@ -520,7 +534,6 @@ import EditStaffScheduleDialog from "components/dialog/EditStaffScheduleDialog.v
 import { fetchUserFromSearch } from "../composables/useUserFromSearch";
 import type { AppointmentEvent } from "../types/appointment";
 
-
 import {
   useQuasar,
   QDialog,
@@ -536,7 +549,9 @@ const interval_height = ref(28);
 const available_booking_time = ref<string[]>([]);
 const staffList = ref<{ staff_id: number; staff_name: string }[]>([]);
 const staffOptions = ref<{ id: number; name: string }[]>([]);
-const serviceOptions = ref<{ id: number; name: string; duration: Number }[]>([]);
+const serviceOptions = ref<{ id: number; name: string; duration: Number }[]>(
+  []
+);
 
 const selectedDate = ref(today());
 const selectedTime = ref("");
@@ -746,7 +761,6 @@ function badgeStyles(
     s.height = timeDurationHeight(Number(event.service_duration || 0)) + "px"; // Ensure service_duration is a number
   }
   s["align-items"] = "flex-start";
-  console.log("badgeStyles", s);
   return s;
 }
 
@@ -919,7 +933,7 @@ async function onDrop(
       status: "booked",
       type: "assigned",
     };
-    await api.put("/api/service-appointments/" + event.id, payload);
+    await api.post("/api/service-appointments/assign/" + event.id, payload);
   } catch (error) {
     console.error("Error updating appointments:", error);
     return false;
@@ -1110,6 +1124,20 @@ function finishAppointment(event: AppintmentEvent) {
   showFinishAppointmentDialog.value = true;
 }
 
+const selectedUser = ref({
+  name: "",
+  id: 0,
+  email: "",
+  phone: "",
+});
+function rebookAppointment(event: AppintmentEvent) {
+  selectedUser.value.name = event.customer_name;
+  selectedUser.value.id = event.customer_id;
+  selectedUser.value.email = event.customer_email;
+  selectedUser.value.phone = event.customer_phone;
+  showAddEventDialog.value = true;
+}
+
 // Sms Related
 const reminder_msg_template = ref("");
 const showSendSmsDialog = ref(false);
@@ -1117,7 +1145,7 @@ const showSendSmsDialog = ref(false);
 async function fetchSystemSetting() {
   const response = await api.get("/api/getSystemSettingByKey", {
     params: {
-      key: "booking_reminder_msg",
+      key: "reminder_msg",
     },
   });
   if (response.data.value) {

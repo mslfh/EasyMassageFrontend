@@ -41,6 +41,7 @@ const routes = [
       { path: 'service', component: () => import('pages/AdminService.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'appointment', component: () => import('pages/AdminAppointment.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'appointment/detail', component: () => import('pages/AdminHistoryDetail.vue'), beforeEnter: adminDeskOnlyGuard },
+      { path: 'appointment/log', component: () => import('pages/AdminAppointmentLog.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'setting', component: () => import('pages/AdminSetting.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'order', component: () => import('pages/AdminOrder.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'order/detail', component: () => import('pages/AdminOrderDetail.vue'), beforeEnter: adminDeskOnlyGuard },

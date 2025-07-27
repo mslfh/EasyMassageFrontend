@@ -120,6 +120,8 @@
                   ? 'red-10'
                   : props.row.status === 'in_progress'
                   ? 'green-4'
+                  : props.row.status === 'cancelled'
+                   ? 'red-5'
                   : 'deep-orange-5'
               "
               :label="props.row.status"
