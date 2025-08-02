@@ -313,6 +313,9 @@
                         event.service_price ? "- $" + event.service_price : ""
                       }}
                     </q-item-label>
+
+                    <!-- Action Buttons -->
+                    <div v-if="isAdminOrDeskRole">
                     <q-chip
                       size="10px"
                       v-if="event.type != 'break' && event.status === 'booked'"
@@ -326,6 +329,7 @@
                     >
                       Start
                     </q-chip>
+
                     <q-chip
                       size="10px"
                       v-if="event.type != 'break' && event.status != 'finished'"
@@ -350,7 +354,7 @@
                     >
                       Rebook
                     </q-chip>
-
+                    </div>
                     <q-item-label
                       class="text-subtitle comment-ellipsis"
                       v-if="event.comments"
@@ -429,7 +433,7 @@
 
   <!-- Edit Event Dialog -->
   <EditAppointmentDialog
-    v-if="showEditEventDialog"
+    v-if="showEditEventDialog && isAdminOrDeskRole"
     :editEventForm="editEventForm"
     :selectedStaff="selectedStaff"
     :selectedDate="selectedDate"
@@ -493,7 +497,7 @@
   />
 
   <EditStaffScheduleDialog
-    v-if="showScheduleStaffDialog.visible"
+    v-if="showScheduleStaffDialog.visible && isAdminOrDeskRole"
     :staffSchedule="showScheduleStaffDialog.staffSchedule"
     :isShowAllStaff="isShowAllStaff"
     @close="
@@ -533,6 +537,10 @@ import EditStaffScheduleDialog from "components/dialog/EditStaffScheduleDialog.v
 
 import { fetchUserFromSearch } from "../composables/useUserFromSearch";
 import type { AppointmentEvent } from "../types/appointment";
+import {
+  isAdminOrDesk,
+  getCurrentUser,
+} from "../utils/auth";
 
 import {
   useQuasar,
@@ -541,6 +549,7 @@ import {
   QCardSection,
   QCardActions,
   QBtn,
+  is,
 } from "quasar";
 
 const $q = useQuasar();
@@ -573,7 +582,14 @@ const currentMonth = computed(() => {
   });
 });
 
+const isAdminOrDeskRole = computed(() => {
+  return isAdminOrDesk();
+});
+
+const currentUser = ref(null);
+
 onMounted(() => {
+  currentUser.value = getCurrentUser();
   fetchSystemSetting();
   fetchAppointments();
   fetchServiceOptions();
@@ -584,15 +600,18 @@ onMounted(() => {
   setInterval(() => {
     scrollToNow();
   }, 1800000); // 每半小时（1800000毫秒）scrollToNow
+  console.log("currentUser", currentUser.value);
 });
 
 const showScheduleStaffDialog = ref({
   visible: false,
   staffSchedule: {},
 });
+
 const staffSchedule = ref([]);
 
 function openScheduleStaffDialog(staffSchedule) {
+
   showScheduleStaffDialog.value.visible = true;
   showScheduleStaffDialog.value.staffSchedule = staffSchedule;
 }
@@ -605,6 +624,17 @@ async function fetchStaffList() {
     },
   });
   staffSchedule.value = staffResponse.data;
+  //Filter only staff if not admin or desk role
+  if (!isAdminOrDeskRole.value) {
+    if(!currentUser.value || !currentUser.value.staff) {
+      staffSchedule.value = [];
+    }
+    else{
+      staffSchedule.value = staffSchedule.value.filter(
+        (staff: any) => staff.id === currentUser.value.staff.id
+      );
+    }
+  }
   staffOptions.value = staffSchedule.value.map((staff: any) => ({
     id: staff.id,
     name: staff.name,
@@ -620,6 +650,17 @@ async function fetchStaffList() {
 const isShowAllStaff = ref(false);
 
 function switchShowAllStaff() {
+  if(!isAdminOrDeskRole.value) {
+    staffList.value = staffSchedule.value
+      .filter((staff: any) => staff.id === currentUser.value.staff.id)
+      .map((staff: any) => ({
+        staff_id: staff.id,
+        staff_name: staff.name,
+        schedule: staff.schedules,
+      }));
+    console.log("staffList", staffList.value);
+    return;
+  }
   if (isShowAllStaff.value) {
     staffList.value = staffSchedule.value.map((staff: any) => ({
       staff_id: staff.id,
@@ -640,6 +681,7 @@ function switchShowAllStaff() {
       }));
   }
 }
+
 
 async function fetchAppointments() {
   try {
@@ -881,6 +923,7 @@ function onDragStart(e: DragEvent, item: DragItem) {
     e.dataTransfer.setData("ID", String(item.id));
   }
 }
+
 function onDragEnter(e: DragEvent, type: string, { scope }: Scope) {
   console.info("onDragEnter", type, scope);
   e.preventDefault();

@@ -33,13 +33,13 @@ const routes = [
       { path: 'schedule', name: 'AdminSchedule', component: () => import('pages/AdminSchedule.vue') },
       { path: 'schedule/week', name: 'AdminScheduleWeek', component: () => import('pages/AdminScheduleWeek.vue') },
       { path: 'schedule/day', name: 'AdminScheduleDay', component: () => import('pages/AdminScheduleDay.vue') },
+      { path: 'appointment', component: () => import('pages/AdminAppointment.vue') },
 
       // Admin and Desk only routes
       { path: 'staff', component: () => import('pages/AdminStaff.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'user', component: () => import('pages/AdminUser.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'package', component: () => import('pages/AdminPackage.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'service', component: () => import('pages/AdminService.vue'), beforeEnter: adminDeskOnlyGuard },
-      { path: 'appointment', component: () => import('pages/AdminAppointment.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'appointment/detail', component: () => import('pages/AdminHistoryDetail.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'appointment/log', component: () => import('pages/AdminAppointmentLog.vue'), beforeEnter: adminDeskOnlyGuard },
       { path: 'setting', component: () => import('pages/AdminSetting.vue'), beforeEnter: adminDeskOnlyGuard },

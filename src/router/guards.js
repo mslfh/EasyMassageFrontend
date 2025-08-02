@@ -23,7 +23,8 @@ export function roleGuard(to, from, next) {
       '/admin',
       '/admin/schedule',
       '/admin/schedule/week',
-      '/admin/schedule/day'
+      '/admin/schedule/day',
+      '/admin/appointment',
     ];
 
     // If staff tries to access other routes, redirect to schedule

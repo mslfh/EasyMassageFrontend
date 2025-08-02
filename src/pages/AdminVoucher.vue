@@ -49,6 +49,14 @@
                 <q-btn
                   flat
                   round
+                  icon="schedule"
+                  size="10px"
+                  color="grey"
+                  @click="fetchVoucherHistory(props.row.id)"
+                />
+                <q-btn
+                  flat
+                  round
                   icon="edit"
                   color="primary"
                   size="10px"
@@ -368,6 +376,78 @@
           </q-card-section>
         </q-card>
       </q-dialog>
+
+      <q-dialog v-model="isVoucherHistoryDialogOpen">
+        <q-card
+          :style="$q.screen.gt.md ? 'min-width: 500px' : 'min-width: 100%'"
+        >
+          <q-card-section horizontal class="q-pl-md q-pt-md">
+            <div class="text-h6 text-grey">Voucher History</div>
+          </q-card-section>
+          <q-card-section>
+            <q-timeline class="q-pl-md" v-if="voucherHistory.length > 0">
+              <q-timeline-entry
+                v-for="event in voucherHistory"
+                :key="event.id"
+                color="blue-5"
+              >
+                <div class="text-grey-6">
+                  <div class="text-weight-bold">
+                    {{ event.action.toUpperCase() }}
+                  </div>
+                  <div>{{ event.description }}</div>
+                  <div v-if="event.name">Customer: {{ event.name }}</div>
+                  <div v-if="event.phone">Phone: {{ event.phone }}</div>
+                  <div v-if="event.service">Service: {{ event.service }}</div>
+                  <div class="text-orange-7">
+                    Amount: ${{ event.pre_amount }} → ${{ event.after_amount }}
+                  </div>
+                  <q-separator
+                    class="q-my-sm"
+                    color="grey-3"
+                    style="height: 1px"
+                  />
+                  <div
+                    class="text-grey-7 text-weight-bold text-caption"
+                    v-if="event.appointment"
+                  >
+                    <q-btn
+                      size="sm"
+                      flat
+                      color="green-4"
+                      icon="list_alt"
+                      @click="
+                        router.push({
+                          path: '/admin/appointment/detail',
+                          query: { id: event.appointment_id },
+                        })
+                      "
+                      label="View Appointment"
+                    >
+                    </q-btn>
+                  </div>
+                </div>
+                <template v-slot:subtitle>
+                  <div class="row q-pa-none">
+                    <q-label class="col-9 text-subtitle2">{{
+                      new Date(event.created_at).toLocaleString("en-AU", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    }}</q-label>
+                  </div>
+                </template>
+              </q-timeline-entry>
+            </q-timeline>
+            <div v-else class="text-center text-grey-5 q-pa-md">
+              No history found for this voucher
+            </div>
+          </q-card-section>
+        </q-card>
+      </q-dialog>
     </q-card>
   </q-page>
 </template>
@@ -531,7 +611,7 @@ const submitAddVoucher = async () => {
     };
     onRequest({ pagination: pagination.value, filter: filter.value });
   } catch (e) {
-    $q.notify({ type: "negative", message: "新增失敗" });
+    $q.notify({ type: "negative", message: "Fail in adding voucher" });
   } finally {
     addLoading.value = false;
   }
@@ -544,7 +624,7 @@ const submitBulkVoucher = async () => {
     delete payload.valid_until_option;
     delete payload._remaining_amount_touched;
     await api.post("/api/vouchers/bulk", payload);
-    $q.notify({ type: "positive", message: "批量新增成功" });
+    $q.notify({ type: "positive", message: "Bulk vouchers added successfully" });
     showAddDialog.value = false;
     bulkForm.value = {
       count: 10,
@@ -560,7 +640,7 @@ const submitBulkVoucher = async () => {
     };
     onRequest({ pagination: pagination.value, filter: filter.value });
   } catch (e) {
-    $q.notify({ type: "negative", message: "批量新增失敗" });
+    $q.notify({ type: "negative", message: "Fail in adding bulk vouchers" });
   } finally {
     addLoading.value = false;
   }
@@ -763,5 +843,32 @@ const deleteVoucher = async (id) => {
       $q.notify({ type: "negative", message: "刪除失敗" });
     }
   });
+};
+
+const isVoucherHistoryDialogOpen = ref(false);
+const voucherHistory = ref([]);
+
+const fetchVoucherHistory = async (voucherId) => {
+  try {
+    const response = await api.get(
+      `/api/voucher-histories/voucher/${voucherId}`
+    );
+    voucherHistory.value = response.data;
+    $q.notify({
+      type: "info",
+      message: "Voucher history fetched successfully",
+      position: "top",
+      timeout: 2000,
+    });
+    isVoucherHistoryDialogOpen.value = true;
+  } catch (error) {
+    console.error("Error fetching voucher history:", error);
+    $q.notify({
+      type: "negative",
+      message: "Failed to fetch voucher history",
+      position: "top",
+      timeout: 2000,
+    });
+  }
 };
 </script>

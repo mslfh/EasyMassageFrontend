@@ -7,7 +7,7 @@
   >
     <q-card :style="$q.screen.gt.md ? 'min-width: 850px' : 'min-width: 100%'">
       <!-- Deleted Status Banner -->
-      <q-banner 
+      <q-banner
         v-if="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
         class="bg-red-1 text-red-8 q-pa-md"
         dense
@@ -268,13 +268,13 @@
               label="Last Name"
               :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
             />
-            <q-input 
-              v-model="editEventForm.customer_email" 
+            <q-input
+              v-model="editEventForm.customer_email"
               label="Email"
               :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
             />
-            <q-input 
-              v-model="editEventForm.customer_phone" 
+            <q-input
+              v-model="editEventForm.customer_phone"
               label="Phone"
               :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
             />
@@ -347,10 +347,10 @@
           color="negative"
           @click="editEventDialog = false"
         />
-        <q-btn 
-          flat 
-          label="Save" 
-          color="positive" 
+        <q-btn
+          flat
+          label="Save"
+          color="positive"
           @click="saveEditedEvent"
           :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
         />
@@ -582,7 +582,7 @@ async function cancelAppointment() {
         if (response.status === 200) {
           // Update the local status to show it's deleted
           editEventForm.value.status = 'cancelled';
-          
+
           $q.notify({
             type: "negative",
             message: "Appointment has been permanently deleted",
@@ -590,10 +590,10 @@ async function cancelAppointment() {
             timeout: 3000,
             icon: "delete_forever",
             actions: [
-              { 
-                label: 'Dismiss', 
-                color: 'white', 
-                handler: () => {} 
+              {
+                label: 'Dismiss',
+                color: 'white',
+                handler: () => {}
               }
             ]
           });

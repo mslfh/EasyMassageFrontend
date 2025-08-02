@@ -64,6 +64,23 @@
               }}
             </span>
           </div>
+
+
+          <div class="row q-pa-none">
+            <span>
+              * Booking Time:
+              {{
+                event.booking_time.slice(0, 16).replace("T", " ")
+              }}
+            </span>
+          </div>
+
+          <div class="row q-pa-none">
+            <span>
+              *  Submitted At :
+              {{ event.created_at.slice(0, 16).replace("T", " ") }}
+            </span>
+          </div>
           <div
             class="text-grey"
             v-if="event.comments"

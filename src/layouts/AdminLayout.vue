@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useQuasar } from "quasar";
+import { is, useQuasar } from "quasar";
 import Messages from "./Messages.vue";
 import Profile from "./Profile.vue";
 import EssentialLink from "components/EssentialLink.vue";
@@ -13,8 +13,8 @@ import { useNotificationStore } from "../stores/NotificationStore";
 import {
   getCurrentUser,
   getUserRole,
-  canAccessAllMenus,
-  canOnlyAccessSchedule,
+  isAdmin,
+  isAdminOrDesk,
 } from "../utils/auth";
 
 const APP_TITLE = import.meta.env.VITE_APP_TITLE;
@@ -33,19 +33,15 @@ const userRole = ref("");
 // Get current user info from localStorage
 onMounted(async () => {
   currentUser.value = getCurrentUser();
-  console.log("Current User:", currentUser.value);
   userRole.value = getUserRole();
-  console.log("User Role:", userRole.value);
-  console.log("Is Admin or Desk:", canAccessAllMenus());
-  console.log("Is Staff Only:", canOnlyAccessSchedule());
-
   // Load initial messages for today
   await notificationStore.fetchMessages();
+  // fetch messages every 10 minutes
+  setInterval(async () => {
+    await notificationStore.fetchMessages();
+  }, 10 * 60 * 1000); // 10 minutes in milliseconds
 });
 
-// Computed properties for role-based visibility
-const isAdminOrDesk = computed(() => canAccessAllMenus());
-const isStaffOnly = computed(() => canOnlyAccessSchedule());
 
 const searchField = ref("");
 const loading = ref(false);
@@ -85,12 +81,21 @@ function viewHistory(user) {
   isHistoryDialogOpen.value = true;
 }
 
+// Check if the user has admin or desk role
+const isAdminOrDeskRole = computed(() => {
+  return isAdminOrDesk();
+});
+// Check if the user has admin role
+const isAdminRole = computed(() => {
+  return isAdmin();
+});
+
 // Get user initials for avatar display
 function getUserInitials() {
   if (!currentUser.value) return "?";
 
   const name = currentUser.value.name;
-  if (!name) return "?";
+     if (!name) return "?";
 
   // If name has spaces, get first letter of first and last name
   const nameParts = name.trim().split(" ");
@@ -134,7 +139,7 @@ async function handleDateChange(newDate) {
           clearable
           v-model="searchField"
           :placeholder="
-            $q.screen.gt.sm && isAdminOrDesk
+            $q.screen.gt.sm && isAdminOrDeskRoleRole
               ? 'Search customer by  phone, name or email.'
               : 'Search'
           "
@@ -148,7 +153,6 @@ async function handleDateChange(newDate) {
 
         <q-menu
           v-if="
-            isAdminOrDesk &&
             searchField !== '' &&
             !loading &&
             foundUsers.length > 0
@@ -277,14 +281,9 @@ async function handleDateChange(newDate) {
         "
       >
         <q-list>
-          <!-- Dashboard - Only for Admin and Desk -->
-          <!-- <q-item
-            v-if="isAdminOrDesk"
-            to="/admin/dashboard"
-            active-class="q-item-no-link-highlighting"
-          > -->
+          <!-- Dashboard - Only for Admin -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminRole"
             active-class="q-item-no-link-highlighting"
           >
             <q-item-section avatar>
@@ -295,9 +294,8 @@ async function handleDateChange(newDate) {
             </q-item-section>
           </q-item>
 
-          <!-- Appointment - Only for Admin and Desk -->
+          <!-- Appointment-->
           <q-item
-            v-if="isAdminOrDesk"
             to="/admin/appointment"
             active-class="q-item-no-link-highlighting"
           >
@@ -311,7 +309,7 @@ async function handleDateChange(newDate) {
 
            <!-- Appointment Log - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/appointment/log"
             active-class="q-item-no-link-highlighting"
           >
@@ -325,7 +323,7 @@ async function handleDateChange(newDate) {
 
           <!-- History - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/history"
             active-class="q-item-no-link-highlighting"
           >
@@ -352,7 +350,7 @@ async function handleDateChange(newDate) {
 
           <!-- Staff - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/staff"
             active-class="q-item-no-link-highlighting"
           >
@@ -366,7 +364,7 @@ async function handleDateChange(newDate) {
 
           <!-- Customer - Only for Admin and Desk -->
           <q-expansion-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             icon="supervisor_account"
             label="Customer"
           >
@@ -397,7 +395,7 @@ async function handleDateChange(newDate) {
           </q-expansion-item>
 
           <!-- Services - Only for Admin and Desk -->
-          <q-expansion-item v-if="isAdminOrDesk" icon="pages" label="Services">
+          <q-expansion-item v-if="isAdminOrDeskRole" icon="pages" label="Services">
             <q-list class="q-pl-lg">
               <q-item
                 to="/admin/package"
@@ -426,7 +424,7 @@ async function handleDateChange(newDate) {
 
           <!-- Invoice - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/order"
             active-class="q-item-no-link-highlighting"
           >
@@ -440,7 +438,7 @@ async function handleDateChange(newDate) {
 
           <!-- Voucher - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/voucher"
             active-class="q-item-no-link-highlighting"
           >
@@ -454,7 +452,7 @@ async function handleDateChange(newDate) {
 
           <!-- Setting - Only for Admin and Desk -->
           <q-item
-            v-if="isAdminOrDesk"
+            v-if="isAdminOrDeskRole"
             to="/admin/setting"
             active-class="q-item-no-link-highlighting"
           >

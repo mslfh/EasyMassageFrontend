@@ -14,7 +14,6 @@
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th auto-width>
-            <q-icon name="expand_more" size="sm" />
           </q-th>
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
             {{ col.label }}
@@ -45,7 +44,7 @@
               </q-chip>
             </template>
             <template v-else-if="col.name === 'actions'">
-              <q-btn flat round icon="delete" color="grey-6" size="10px" />
+              <!-- <q-btn flat round icon="delete" color="grey-6" size="10px" /> -->
               <q-btn
                 flat
                 round
@@ -80,10 +79,20 @@
               </q-btn>
             </template>
             <template v-else-if="col.format">
-              {{ col.format(typeof col.field === 'function' ? col.field(props.row) : props.row[col.field]) }}
+              {{
+                col.format(
+                  typeof col.field === "function"
+                    ? col.field(props.row)
+                    : props.row[col.field]
+                )
+              }}
             </template>
             <template v-else>
-              {{ typeof col.field === 'function' ? col.field(props.row) : props.row[col.field] }}
+              {{
+                typeof col.field === "function"
+                  ? col.field(props.row)
+                  : props.row[col.field]
+              }}
             </template>
           </q-td>
         </q-tr>
@@ -143,7 +152,7 @@ const orders = ref([]);
 const filter = ref("");
 const loading = ref(false);
 const pagination = ref({
-  sortBy: "id",
+  sortBy: "updated_at",
   descending: false,
   page: 1,
   rowsPerPage: 10,
@@ -152,12 +161,34 @@ const pagination = ref({
 
 const columns = [
   {
-    name: "id",
-    required: true,
-    label: "No",
+    name: "service",
+    label: "Service",
     align: "left",
-    field: "id",
+    field: (row) =>
+      row.appointment
+        ? row.appointment.services.map((s) => s.service_title).join(", ")
+        : "",
   },
+{
+    name: "booking_time",
+    label: "Booking Time",
+    align: "center",
+    field: (row) => row.appointment?.booking_time || "",
+    sortable : true,
+    format: (val) =>
+      val
+        ? new Date(val).toLocaleString("en-AU", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : "",
+  },
+
+
   {
     name: "order_status",
     label: "Order Status",
@@ -191,37 +222,29 @@ const columns = [
     field: "paid_amount",
     format: (val) => `$${val}`,
   },
+
   {
     name: "customer_name",
     label: "Customer Name",
     align: "left",
-    field: row => row.appointment ? `${row.appointment.customer_first_name || ''} ${row.appointment.customer_last_name || ''}`.trim() : '',
+    field: (row) =>
+      row.appointment
+        ? `${row.appointment.customer_first_name || ""} ${
+            row.appointment.customer_last_name || ""
+          }`.trim()
+        : "",
   },
   {
     name: "customer_phone",
     label: "Customer Phone",
     align: "left",
-    field: row => row.appointment?.customer_phone || '',
-  },
-  {
-    name: "booking_time",
-    label: "Booking Time",
-    align: "left",
-    field: row => row.appointment?.booking_time || '',
-    format: val => val ? new Date(val).toLocaleString("en-AU", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }) : '',
+    field: (row) => row.appointment?.customer_phone || "",
   },
   {
     name: "staff_name",
     label: "Therapist",
     align: "left",
-    field: row => row.appointment?.services[0].staff_name || '',
+    field: (row) => row.appointment?.services[0].staff_name || "",
   },
   { name: "actions", label: "Actions", align: "center", field: "actions" },
 ];
@@ -278,6 +301,10 @@ const onRequest = (props) => {
   const count = rowsPerPage === 0 ? pagination.value.rowsNumber : rowsPerPage;
 
   fetchOrders(startRow, count, filterValue, sortBy, descending);
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  pagination.value.sortBy = sortBy;
+  pagination.value.descending = descending;
 };
 
 const wrapCsvValue = (val, formatFn, row) => {
