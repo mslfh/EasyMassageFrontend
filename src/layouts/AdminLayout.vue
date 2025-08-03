@@ -113,6 +113,13 @@ function getUserInitials() {
 async function handleDateChange(newDate) {
   await notificationStore.changeDateAndFetch(newDate);
 }
+
+// Navigate to Omneas website
+function goToOmneasWebsite() {
+  return;
+  // TODO: Replace with actual Omneas website URL
+  window.open('https://omneas.com', '_blank');
+}
 </script>
 
 <template>
@@ -218,7 +225,7 @@ async function handleDateChange(newDate) {
           >
           </q-btn>
           <q-btn
-            v-if="true"
+            v-if="isAdminOrDeskRole"
             round
             dense
             flat
@@ -475,8 +482,8 @@ async function handleDateChange(newDate) {
               @click="zoomLeftDrawer"
             >
               <img
-                src="https://cdn.quasar.dev/logo-v2/svg/logo.svg"
-                alt="Quasar Logo"
+                src="../assets/adminLogo.png"
+                alt="Logo"
               />
             </q-avatar>
             <q-toolbar-title
@@ -515,6 +522,21 @@ async function handleDateChange(newDate) {
         <router-view />
       </q-page>
     </q-page-container>
+
+    <!-- Footer -->
+     <q-footer class="text-grey-5 text-right q-pa-xs" style="background: transparent; min-height: 24px;">
+      <div style="font-size: 10px;">
+        © {{ new Date().getFullYear() }}
+        <span
+          class="text-blue-4 cursor-pointer"
+          style="font-weight: 500; "
+          @click="goToOmneasWebsite"
+        >
+          OMNEAS
+        </span>
+        . All rights reserved.
+      </div>
+    </q-footer>
   </q-layout>
 
   <AddAppointmentDialog

@@ -45,6 +45,20 @@
     <q-page-container>
           <router-view />
     </q-page-container>
+
+    <!-- Footer -->
+    <q-footer class="text-grey-5 text-right q-pa-xs" style="background: transparent; min-height: 24px;">
+      <div style="font-size: 10px;">
+        © {{ new Date().getFullYear() }}
+        <span
+          class="cursor-pointer"
+          style="font-weight: 500;"
+          @click="goToOmneasWebsite"
+        >
+          Omneas.
+        </span>
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -81,6 +95,13 @@ export default defineComponent({
     const leftDrawerOpen = ref(false);
     const miniState = ref(false);
 
+    // Navigate to Omneas website
+    const goToOmneasWebsite = () => {
+      return;
+      // TODO: Replace with actual Omneas website URL
+      window.open('https://omneas.com', '_blank');
+    };
+
     return {
       slide: ref(1),
       autoplay: ref(true),
@@ -102,6 +123,7 @@ export default defineComponent({
       byDate: "Any time",
       links1,
       links2,
+      goToOmneasWebsite,
       mail_data: [
         {
           name: "Pratik Patel",

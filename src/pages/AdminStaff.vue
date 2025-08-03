@@ -36,6 +36,14 @@
             @click="editStaff(props.row)"
           />
           <q-btn
+            flat
+            size="10px"
+            round
+            icon="lock"
+            color="orange"
+            @click="openChangePasswordDialog(props.row)"
+          />
+          <q-btn
             size="10px"
             flat
             round
@@ -54,7 +62,7 @@
         </q-card-section>
         <q-card-section>
           <q-input v-model="editForm.name" label="Name" />
-          <q-input filled v-model="editForm.email" label="Email" type="email" />
+          <!-- <q-input filled v-model="editForm.email" label="Email" type="email" /> -->
           <q-input v-model="editForm.position" label="Position" />
           <q-select
             v-model="editForm.status"
@@ -137,6 +145,43 @@
             @click="isAddDialogOpen = false"
           />
           <q-btn flat label="Add" color="green" @click="addStaff" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="isChangePasswordDialogOpen">
+      <q-card style="min-width: 400px">
+        <q-card-section>
+          <div class="text-h6">Change Password for {{ changePasswordTarget?.name }}</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input
+            v-model="newPassword"
+            label="New Password"
+          />
+          <q-input
+            v-model="confirmPassword"
+            debounce="300"
+            label="Confirm Password"
+            type="password"
+            :error="newPassword !== confirmPassword && confirmPassword !== ''"
+            :error-message="newPassword !== confirmPassword ? 'Passwords do not match' : ''"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            flat
+            label="Cancel"
+            color="primary"
+            @click="cancelChangePassword"
+          />
+          <q-btn
+            flat
+            label="Change Password"
+            color="orange"
+            @click="changePassword"
+            :disable="!newPassword || !confirmPassword || newPassword !== confirmPassword"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -294,4 +339,51 @@ const statusOptions = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
 ];
+
+const isChangePasswordDialogOpen = ref(false);
+const changePasswordTarget = ref(null);
+const newPassword = ref("");
+const confirmPassword = ref("");
+
+const openChangePasswordDialog = (row) => {
+  changePasswordTarget.value = row;
+  newPassword.value = "";
+  confirmPassword.value = "";
+  isChangePasswordDialogOpen.value = true;
+};
+
+const cancelChangePassword = () => {
+  isChangePasswordDialogOpen.value = false;
+  changePasswordTarget.value = null;
+  newPassword.value = "";
+  confirmPassword.value = "";
+};
+
+const changePassword = async () => {
+  if (!changePasswordTarget.value) {
+    console.error("No target user selected");
+    return;
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    console.error("Passwords do not match");
+    return;
+  }
+
+  try {
+    const userId = changePasswordTarget.value.user_id || changePasswordTarget.value.id;
+    await api.post('/api/user/change-password/' + userId, {
+      new_password: newPassword.value,
+    });
+
+    isChangePasswordDialogOpen.value = false;
+    changePasswordTarget.value = null;
+    newPassword.value = "";
+    confirmPassword.value = "";
+
+    console.log("Password changed successfully");
+  } catch (error) {
+    console.error("Error changing password:", error);
+  }
+};
 </script>

@@ -5,7 +5,7 @@
         <q-card v-bind:style="$q.screen.lt.sm?{'width': '80%'}:{'width':'30%'}">
           <q-card-section>
             <q-avatar size="103px" class="absolute-center shadow-10">
-              <img src="profile.svg">
+              <img src="../assets/Omneas.png" alt="Logo" />
             </q-avatar>
           </q-card-section>
           <q-card-section>
@@ -36,9 +36,25 @@
             </q-form>
           </q-card-section>
         </q-card>
+
+        <!-- Floating Footer -->
+        <div class="absolute-bottom text-white text-center q-pa-xs" style="width: 100%;">
+          <div style="font-size: 10px; opacity: 0.8;">
+            © {{ new Date().getFullYear() }}
+            <span
+              class="cursor-pointer"
+              style="font-weight: 500; text-decoration: underline;"
+              @click="goToOmneasWebsite"
+            >
+              OMNEAS
+            </span>
+            . All rights reserved.
+          </div>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
+
 </template>
 
 <script setup>
@@ -62,10 +78,17 @@ const handleLogin = async () => {
     localStorage.setItem("authToken", token); // Store token in localStorage
     localStorage.setItem("user", JSON.stringify(user)); // Optionally store user info
 
-    router.push("/admin"); // Redirect to admin dashboard
+    router.push("/admin/appointment"); // Redirect to admin dashboard
   } catch (error) {
     console.error("Login failed:", error);
   }
+};
+
+// Navigate to Omneas website
+const goToOmneasWebsite = () => {
+  return;
+  // TODO: Replace with actual Omneas website URL
+  window.open('https://omneas.com', '_blank');
 };
 </script>
 
