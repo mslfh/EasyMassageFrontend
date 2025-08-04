@@ -14,7 +14,7 @@
             control-color="white"
             navigation
             infinite
-            :autoplay="5000"
+            :autoplay="isMenuOpen ? false : 5000"
             height="100%"
             class="text-white rounded-borders"
             style="background: #7165ec"
@@ -36,7 +36,27 @@
                     z-index: 10;
                   "
                   color="white"
-                />
+                >
+                  <q-menu @show="isMenuOpen = true" @hide="isMenuOpen = false">
+                    <q-list style="min-width: 300px">
+                      <q-item-label header class="text-subtitle1"
+                        >* Select Date Range</q-item-label
+                      >
+                      <q-item>
+                        <q-item-section>
+                          <q-date
+                            v-model="analyticsDateRange"
+                            range
+                            color="deep-purple-4"
+                            class="no-shadow"
+                            @update:model-value="updateAnalyticsDateRange"
+                          />
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
@@ -47,36 +67,20 @@
                         class="text-subtitle1 text-white"
                         style="opacity: 0.8"
                       >
-                        The recent service performance metrics
+                        Service performance for {{ formattedDateRange }}
                       </div>
                     </div>
-
-                    <div class="q-mt-md">
-                      <div class="text-h5 text-white q-mb-md">Top</div>
+                    <div class="q-mb-md">
+                      <div class="text-h5 text-white q-mb-md">
+                        Top Services and Staff
+                      </div>
                       <div class="row q-gutter-lg">
                         <div class="col">
-                          <div class="text-h6 text-white  q-mb-md">
-                            {{ serviceStatistics.top_staff }}
-                          </div>
                           <div
-                            class="text-body2 text-white"
-                            style="opacity: 0.8"
+                            class="text-body2 text-white ellipsis"
+                            style="max-width: 150px"
+                            :title="serviceStatistics.top_services"
                           >
-                            Top Staff
-                          </div>
-                          <div class="text-body2 text-white q-mt-sm ">
-                            {{ serviceStatistics.top_staff_appointments }}
-                          </div>
-                          <div
-                            class="text-body2 text-white"
-                            style="opacity: 0.8"
-                          >
-                            Staff's appointments
-                          </div>
-                        </div>
-
-                        <div class="col">
-                          <div class="text-body1 text-white">
                             {{ serviceStatistics.top_services }}
                           </div>
                           <div
@@ -85,14 +89,38 @@
                           >
                             Top Services
                           </div>
-                          <div class="text-body2 text-white q-mt-sm">
+                          <div class="text-body1 text-white q-mt-sm">
                             {{ serviceStatistics.top_services_count }}
                           </div>
                           <div
                             class="text-body2 text-white"
                             style="opacity: 0.8"
                           >
-                            Services Completed
+                            Completed
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div
+                            class="text-body1 text-white ellipsis"
+                            style="max-width: 150px"
+                            :title="serviceStatistics.top_staff"
+                          >
+                            {{ serviceStatistics.top_staff }}
+                          </div>
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Top Staff
+                          </div>
+                          <div class="text-body1 text-white q-mt-sm">
+                            {{ serviceStatistics.top_staff_appointments }}
+                          </div>
+                          <div
+                            class="text-body2 text-white"
+                            style="opacity: 0.8"
+                          >
+                            Staff's appointments
                           </div>
                         </div>
                       </div>
@@ -126,7 +154,27 @@
                     z-index: 10;
                   "
                   color="white"
-                />
+                >
+                  <q-menu @show="isMenuOpen = true" @hide="isMenuOpen = false">
+                    <q-list style="min-width: 300px">
+                      <q-item-label header class="text-subtitle1"
+                        >* Select Date Range</q-item-label
+                      >
+                      <q-item>
+                        <q-item-section>
+                          <q-date
+                            v-model="analyticsDateRange"
+                            range
+                            color="deep-purple-4"
+                            class="no-shadow"
+                            @update:model-value="updateAnalyticsDateRange"
+                          />
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
@@ -137,18 +185,17 @@
                         class="text-subtitle1 text-white"
                         style="opacity: 0.8"
                       >
-                        Updated {{ formatUpdateTime() }}
+                        Appointment analytics for {{ formattedDateRange }}
                       </div>
                     </div>
-
                     <div class="q-mt-md">
                       <div class="text-h5 text-white q-mb-md">
-                        Today's Overview
+                        Period Overview
                       </div>
                       <div class="row q-gutter-lg">
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{ todayStatistics.total_appointments }}
+                            {{ appointmentAnalysisStatistics.total_appointments }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -157,7 +204,11 @@
                             Total Appointments
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
-                            ${{ todayStatistics.total_revenue.toFixed(0) }}
+                            ${{
+                              appointmentAnalysisStatistics.appointment_amount?.toFixed(
+                                0
+                              ) || 0
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -168,9 +219,7 @@
                         </div>
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{
-                              todayStatistics.appointmentGroup?.finished || 0
-                            }}
+                            {{ appointmentAnalysisStatistics.completed_appointments }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -179,7 +228,7 @@
                             Completed
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
-                            {{ todayStatistics.appointmentGroup?.booked || 0 }}
+                            {{ appointmentAnalysisStatistics.pending_appointments }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -216,7 +265,38 @@
                     z-index: 10;
                   "
                   color="white"
-                />
+                >
+                  <q-menu @show="isMenuOpen = true" @hide="isMenuOpen = false">
+                    <q-list style="min-width: 300px">
+                      <q-item>
+                        <q-item-section>
+                          <q-date
+                            v-model="analyticsDateRange"
+                            range
+                            color="deep-purple-4"
+                            class="no-shadow"
+                            @update:model-value="updateAnalyticsDateRange"
+                          />
+                        </q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item
+                        clickable
+                        v-close-popup
+                        @click="resetAnalyticsDateRange"
+                      >
+                        <q-item-section>
+                          <q-item-label class="text-grey-6"
+                            >Reset
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-icon name="refresh" />
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                 <div class="row fit">
                   <div class="col-7 column justify-between">
                     <div>
@@ -227,18 +307,19 @@
                         class="text-subtitle1 text-white"
                         style="opacity: 0.8"
                       >
-                        Financial performance overview
+                        Revenue analysis for {{ formattedDateRange }}
                       </div>
                     </div>
-
                     <div class="q-mt-md">
                       <div class="text-h5 text-white q-mb-md">
-                        Payment Distribution
+                        Revenue Distribution
                       </div>
                       <div class="row q-gutter-lg">
                         <div class="col">
                           <div class="text-h6 text-white">
-                            ${{ todayStatistics.total_revenue.toFixed(0) }}
+                            ${{
+                              revenueStatistics.total_revenue?.toFixed(0) || 0
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -247,7 +328,9 @@
                             Total Revenue
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
-                            ${{ todayStatistics.total_paid?.toFixed(0) || 0 }}
+                            ${{
+                              revenueStatistics.paid_amount?.toFixed(0) || 0
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -258,22 +341,28 @@
                         </div>
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{ topPaymentMethods.length }}
+                            ${{
+                              revenueStatistics.average_revenue_per_appointment?.toFixed(
+                                0
+                              ) || 0
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
                             style="opacity: 0.8"
                           >
-                            Payment Methods
+                            Avg Per Appointment
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
-                            {{ topPaymentMethodPercentage.toFixed(1) }}%
+                            ${{
+                              revenueStatistics.unpaid_amount?.toFixed(0) || 0
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
                             style="opacity: 0.8"
                           >
-                            Paid Rate
+                            Unpaid Amount
                           </div>
                         </div>
                       </div>
@@ -293,7 +382,7 @@
         </q-card>
       </div>
 
-      <!--Today Income Earned -->
+      <!--Income Earned -->
       <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
         <q-card class="fit bg-white q-pa-lg shadow-1">
           <div class="row q-mb-md">
@@ -306,21 +395,21 @@
 
             <div class="col-6">
               <div class="text-h5 text-weight-bold text-grey-7">
-                {{ todayStatistics.total_appointments }}
+                {{ appointmentStatistics.total_appointments }}
               </div>
               <div class="text-subtitle2 text-grey-5 q-mb-md">Appointments</div>
             </div>
 
             <div class="col-auto text-subtitle2 text-grey-5">
               <q-icon name="circle" size="15px" class="text-green-2" />
-              Today
+              {{ formattedAppointmentDateRange }}
             </div>
           </div>
 
           <div class="text-h4 text-weight-bold text-grey-7">
-            ${{ todayStatistics.total_revenue.toFixed(2) }}
+            ${{ appointmentStatistics.total_revenue.toFixed(2) }}
           </div>
-          <div class="text-subtitle2 text-grey-5 q-mb-md">Sale Amount</div>
+          <div class="text-subtitle2 text-grey-5 q-mb-md">Total Amount</div>
           <div style="height: 120px; overflow: hidden">
             <!-- Appointments line chart in this week -->
             <ApexCharts
@@ -338,11 +427,32 @@
         <q-card class="fit bg-white q-pa-lg shadow-1">
           <div class="row items-center q-mb-xs">
             <div class="text-h6 text-grey-6">Revenue Summary</div>
-            <!-- <div class="text-orange-6 text-weight-bold q-ml-auto">+18.2%</div> -->
+            <div class="text-grey-5 text-weight-bold q-ml-auto">
+              <q-btn flat round icon="more_vert">
+                <q-menu>
+                  <q-list style="min-width: 300px">
+                    <q-item>
+                      <q-item-section>
+                        <q-date
+                          v-model="appointmentTrackerDateRange"
+                          range
+                          color="deep-purple-4"
+                          class="no-shadow"
+                          @update:model-value="
+                            updateAppointmentTrackerDateRange
+                          "
+                        />
+                      </q-item-section>
+                    </q-item>
+                    <q-separator />
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </div>
           </div>
 
           <div class="text-h4 text-weight-bold text-grey-5">
-            ${{ todayStatistics.total_paid.toFixed(2) }}
+            ${{ appointmentStatistics.total_paid.toFixed(2) }}
           </div>
 
           <!-- Payment Methods Grid -->
@@ -416,16 +526,35 @@
           <div class="row items-center q-mb-md">
             <div class="col">
               <div class="text-h6 text-grey-6">Appointment Tracker</div>
-              <div class="text-subtitle2 text-grey-5">Today</div>
+              <div class="text-subtitle2 text-grey-5">
+                {{ formattedAppointmentDateRange }}
+              </div>
             </div>
-            <q-btn flat round icon="more_vert" class="q-ml-auto" />
+            <q-btn flat round icon="more_vert" class="q-ml-auto">
+              <q-menu>
+                <q-list style="min-width: 300px">
+                  <q-item>
+                    <q-item-section>
+                      <q-date
+                        v-model="appointmentTrackerDateRange"
+                        range
+                        color="deep-purple-4"
+                        class="no-shadow"
+                        @update:model-value="updateAppointmentTrackerDateRange"
+                      />
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                </q-list>
+              </q-menu>
+            </q-btn>
           </div>
 
           <div class="row">
             <!-- Left: Ticket Stats -->
             <div class="col-5">
               <div class="text-h2 text-weight-bold text-grey-7">
-                {{ todayStatistics.total_appointments }}
+                {{ appointmentStatistics.total_appointments }}
               </div>
               <div class="text-subtitle2 text-grey-5 q-mb-lg">
                 Aggregate Appointments
@@ -442,7 +571,7 @@
                 <div class="q-ml-md">
                   <div class="text-body1 text-grey-6">Finished</div>
                   <div class="text-caption text-grey-5">
-                    {{ todayStatistics.appointmentGroup?.finished || 0 }}
+                    {{ appointmentStatistics.appointmentGroup?.finished || 0 }}
                     Checked Appointments
                   </div>
                 </div>
@@ -462,7 +591,7 @@
                 <div class="q-ml-md">
                   <div class="text-body1 text-grey-6">Pending</div>
                   <div class="text-caption text-grey-5">
-                    {{ todayStatistics.appointmentGroup?.booked || 0 }}
+                    {{ appointmentStatistics.appointmentGroup?.booked || 0 }}
                     Pending Appointments
                   </div>
                 </div>
@@ -477,7 +606,9 @@
                 <div class="q-ml-md">
                   <div class="text-body1 text-grey-6">In Progress</div>
                   <div class="text-caption text-grey-5">
-                    {{ todayStatistics.appointmentGroup?.in_progress || 0 }}
+                    {{
+                      appointmentStatistics.appointmentGroup?.in_progress || 0
+                    }}
                     Appointments
                   </div>
                 </div>
@@ -493,7 +624,7 @@
                 <div class="q-ml-md">
                   <div class="text-body1 text-grey-6">No Show</div>
                   <div class="text-caption text-grey-5">
-                    {{ todayStatistics.appointmentGroup?.pending || 0 }}
+                    {{ appointmentStatistics.appointmentGroup?.pending || 0 }}
                     Appointments
                   </div>
                 </div>
@@ -509,7 +640,7 @@
                 <div class="q-ml-md">
                   <div class="text-body1 text-grey-6">Cancelled</div>
                   <div class="text-caption text-grey-5">
-                    {{ todayStatistics.appointmentGroup?.cancelled || 0 }}
+                    {{ appointmentStatistics.appointmentGroup?.cancelled || 0 }}
                     Appointments
                   </div>
                 </div>
@@ -538,7 +669,24 @@
               <div class="text-h6 text-grey-6">Summary of Staff Earnings</div>
               <div class="text-subtitle2 text-grey-5">Weekly Statements</div>
             </div>
-            <q-btn flat round icon="more_vert" class="q-ml-auto" />
+            <q-btn flat round icon="more_vert" class="q-ml-auto">
+              <q-menu>
+                <q-list style="min-width: 300px">
+                  <q-item>
+                    <q-item-section>
+                      <q-date
+                        v-model="staffDateRange"
+                        range
+                        color="deep-purple-4"
+                        class="no-shadow"
+                        @update:model-value="updateStaffDateRange"
+                      />
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                </q-list>
+              </q-menu>
+            </q-btn>
           </div>
 
           <!-- Staff Selection Buttons -->
@@ -834,11 +982,12 @@
 import { ref, computed, onMounted } from "vue";
 import { api } from "boot/axios";
 import ApexCharts from "vue3-apexcharts";
-import {
-  getUserRole,
-} from "../utils/auth";
+import { getUserRole } from "../utils/auth";
 
 const userRole = ref("");
+
+// Menu state for carousel control
+const isMenuOpen = ref(false);
 
 const AppointmentTrackerchartOptions = {
   chart: {
@@ -1102,96 +1251,7 @@ const AppointmentWeekSeries = ref([
   },
 ]);
 
-const countries = [
-  {
-    name: "United States",
-    amount: "2.45",
-    trend: 5.8,
-    flag: "https://flagcdn.com/us.svg",
-  },
-  {
-    name: "Brazil",
-    amount: "4.78",
-    trend: -6.2,
-    flag: "https://flagcdn.com/br.svg",
-  },
-  {
-    name: "India",
-    amount: "1.48",
-    trend: 22.3,
-    flag: "https://flagcdn.com/in.svg",
-  },
-  {
-    name: "Australia",
-    amount: "2.12",
-    trend: -31.9,
-    flag: "https://flagcdn.com/au.svg",
-  },
-  {
-    name: "France",
-    amount: "2.45",
-    trend: 6.2,
-    flag: "https://flagcdn.com/fr.svg",
-  },
-  {
-    name: "China",
-    amount: "1.90",
-    trend: 4.8,
-    flag: "https://flagcdn.com/cn.svg",
-  },
-];
-const marketing = [
-  {
-    label: "Email Messages",
-    value: "12,346",
-    percent: 0.3,
-    icon: "mail",
-    color: "green-5",
-    bg: "bg-green-1",
-  },
-  {
-    label: "Emails Opened",
-    value: "8,734",
-    percent: 2.1,
-    icon: "link",
-    color: "cyan-5",
-    bg: "bg-cyan-1",
-  },
-  {
-    label: "Links Clicked",
-    value: "967",
-    percent: 1.4,
-    icon: "campaign",
-    color: "red-5",
-    bg: "bg-red-1",
-  },
-  {
-    label: "Subscribers",
-    value: "345",
-    trend: 8.5,
-    icon: "person",
-    color: "cyan-7",
-    bg: "bg-cyan-1",
-  },
-  {
-    label: "Complaints",
-    value: "10",
-    percent: 1.5,
-    icon: "report_problem",
-    color: "red-5",
-    bg: "bg-red-1",
-  },
-  {
-    label: "Unsubscribers",
-    value: "86",
-    percent: 0.8,
-    icon: "block",
-    color: "orange-5",
-    bg: "bg-orange-1",
-  },
-];
-
-const todayStatistics = ref({
+const appointmentStatistics = ref({
   total_appointments: 0,
   total_revenue: 0,
   total_paid: 0,
@@ -1388,11 +1448,11 @@ const totalServiceCount = computed(() => {
 
 // Computed property for appointment conversion rate
 const appointmentConversionRate = computed(() => {
-  if (todayStatistics.value.total_appointments === 0) return "0.0";
+  if (appointmentStatistics.value.total_appointments === 0) return "0.0";
   const finishedAppointments =
-    todayStatistics.value.appointmentGroup?.finished || 0;
+    appointmentStatistics.value.appointmentGroup?.finished || 0;
   return (
-    (finishedAppointments / todayStatistics.value.total_appointments) *
+    (finishedAppointments / appointmentStatistics.value.total_appointments) *
     100
   ).toFixed(1);
 });
@@ -1406,10 +1466,12 @@ const formatUpdateTime = () => {
   return "this evening";
 };
 
+const startDate = ref("");
+const endDate = ref("");
 onMounted(() => {
   fetchTodayStatistics();
   fetchStaffIncomeStatistics();
-  fetchServiceStatistics();
+  fetchAnalyticsStatistics();
   userRole.value = getUserRole();
 });
 
@@ -1420,27 +1482,152 @@ const serviceStatistics = ref({
   top_staff_appointments: 0,
 });
 
-const startDate = ref("");
-const endDate = ref("");
+const revenueStatistics = ref({
+  total_revenue: 0,
+  average_revenue_per_appointment: 0,
+  paid_amount: 0,
+  unpaid_amount: 0,
+});
 
-async function fetchServiceStatistics() {
-  startDate.value = new Date();
-  endDate.value = new Date();
-  startDate.value.setDate(startDate.value.getDate() - 30); // 30 days ago
-  endDate.value.setDate(endDate.value.getDate()); // Today
+const appointmentAnalysisStatistics = ref({
+  appointment_amount: 0,
+  completed_appointments: 0,
+  pending_appointments: 0,
+  total_appointments: 0,
+});
+
+const analyticsDateRange = ref(null);
+
+// Computed property to format date range display
+const formattedDateRange = computed(() => {
+  if (
+    !analyticsDateRange.value ||
+    !analyticsDateRange.value.from ||
+    !analyticsDateRange.value.to
+  ) {
+    return "last 30 days";
+  }
+  return `${formatDate(analyticsDateRange.value.from)} - ${formatDate(
+    analyticsDateRange.value.to
+  )}`;
+});
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year:
+      new Date(date).getFullYear() !== new Date().getFullYear()
+        ? "numeric"
+        : undefined,
+  });
+};
+
+// Handle analytics date range updates
+const updateAnalyticsDateRange = (newRange) => {
+  if (newRange && newRange.from && newRange.to) {
+    fetchAnalyticsStatistics();
+  }
+};
+const resetAnalyticsDateRange = () => {
+  analyticsDateRange.value = null;
+  fetchAnalyticsStatistics(); // Fetch current week data
+};
+
+async function fetchAnalyticsStatistics() {
+  if (!analyticsDateRange.value) {
+    analyticsDateRange.value = {
+      from: new Date(new Date().setDate(new Date().getDate() - 30)), // 30 days ago
+      to: new Date(),
+    };
+  }
   try {
-    const response = await api.get("/api/getServiceStatistics", {
+    const response = await api.get("/api/getAnalyticsStatistics", {
       params: {
-        start_date: startDate.value.toISOString().split("T")[0], // Format date as YYYY-MM-DD
-        end_date: endDate.value.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+        start_date: analyticsDateRange.value.from, // Format date as YYYY-MM-DD
+        end_date: analyticsDateRange.value.to, // Format date as YYYY-MM-DD
       },
     });
     if (response.data) {
-      serviceStatistics.value = response.data;
-      console.log("Service statistics:", serviceStatistics.value);
+      // Update service statistics
+      if (response.data.service_statistics) {
+        serviceStatistics.value = response.data.service_statistics;
+      }
+
+      // Update appointment statistics
+      if (response.data.appointment_statistics) {
+        appointmentAnalysisStatistics.value = response.data.appointment_statistics;
+      }
+
+      // Update revenue statistics
+      if (response.data.revenue_statistics) {
+        revenueStatistics.value = response.data.revenue_statistics;
+      }
+
+      console.log("Analytics statistics:", {
+        service: serviceStatistics.value,
+        appointment: appointmentAnalysisStatistics.value,
+        revenue: revenueStatistics.value,
+      });
     }
   } catch (error) {
-    console.error("Error fetching service statistics:", error);
+    console.error("Error fetching analytics statistics:", error);
+  }
+}
+
+const appointmentTrackerDateRange = ref(null);
+
+// Computed property to format date range display
+const formattedAppointmentDateRange = computed(() => {
+  if (
+    !appointmentTrackerDateRange.value ||
+    !appointmentTrackerDateRange.value.from ||
+    !appointmentTrackerDateRange.value.to
+  ) {
+    return "Today";
+  }
+  return `${formatDate(appointmentTrackerDateRange.value.from)} - ${formatDate(
+    appointmentTrackerDateRange.value.to
+  )}`;
+});
+
+const updateAppointmentTrackerDateRange = (newRange) => {
+  if (newRange && newRange.from && newRange.to) {
+    appointmentTrackerDateRange.value = newRange;
+    fetchAppointmentStatistics(); // Fetch data for the selected date range
+  }
+};
+
+const resetAppointmentTrackerDateRange = () => {
+  appointmentTrackerDateRange.value = null;
+  fetchAppointmentStatistics(); // Fetch today's data
+};
+
+async function fetchAppointmentStatistics() {
+  if (!appointmentTrackerDateRange.value) {
+    appointmentTrackerDateRange.value = {
+      from: new Date(new Date().setDate(new Date().getDate() - 30)), // 30 days ago
+      to: new Date(),
+    };
+  }
+  try {
+    const response = await api.get("/api/getAppointmentStatistics", {
+      params: {
+        start_date: appointmentTrackerDateRange.value.from, // Format date as YYYY-MM-DD
+        end_date: appointmentTrackerDateRange.value.to, // Format date as YYYY-MM-DD
+      },
+    });
+    if (response.data) {
+      appointmentStatistics.value = {
+        total_appointments: response.data.total_appointments || 0,
+        total_revenue: response.data.total_revenue || 0,
+        total_paid: response.data.total_paid || 0,
+        appointmentGroup: response.data.appointmentGroup || null,
+        orderGroup: response.data.orderGroup || null,
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching analytics statistics:", error);
   }
 }
 
@@ -1449,14 +1636,14 @@ async function fetchTodayStatistics() {
     const response = await api.get("/api/getTodayStatistics");
 
     if (response.data) {
-      todayStatistics.value = {
+      appointmentStatistics.value = {
         total_appointments: response.data.total_appointments || 0,
         total_revenue: response.data.total_revenue || 0,
         total_paid: response.data.total_paid || 0,
         appointmentGroup: response.data.appointmentGroup || null,
         orderGroup: response.data.orderGroup || null,
       };
-      console.log("Today's statistics:", todayStatistics.value);
+      console.log("Today's statistics:", appointmentStatistics.value);
 
       // Update AppointmentTrackerSeries
       AppointmentTrackerSeries.value = [
@@ -1485,19 +1672,48 @@ async function fetchTodayStatistics() {
   }
 }
 
+const staffDateRange = ref(null);
+// Computed property to format staff date range display
+const formattedStaffDateRange = computed(() => {
+  if (
+    !staffDateRange.value ||
+    !staffDateRange.value.from ||
+    !staffDateRange.value.to
+  ) {
+    return "This Week";
+  }
+  return `${formatDate(staffDateRange.value.from)} - ${formatDate(
+    staffDateRange.value.to
+  )}`;
+});
+
+const updateStaffDateRange = (newRange) => {
+  if (newRange && newRange.from && newRange.to) {
+    staffDateRange.value = newRange;
+    fetchStaffIncomeStatistics(); // Fetch data for the selected date range
+  }
+};
+
 async function fetchStaffIncomeStatistics() {
   try {
-    const date = new Date();
-    // if weekly statistics, set to the start of the week (Monday)
-    const start_date = new Date(
-      date.setDate(date.getDate() - date.getDay() + 1)
-    );
-    const end_date = new Date(date.setDate(date.getDate() - date.getDay() + 7));
+    if (!staffDateRange.value) {
+      const today = new Date();
+      const dayOfWeek = today.getDay() === 0 ? 7 : today.getDay(); // Treat Sunday (0) as 7
 
+      const start_date = new Date(today);
+      start_date.setDate(today.getDate() - dayOfWeek + 1); // Monday
+
+      const end_date = new Date(today);
+      end_date.setDate(today.getDate() - dayOfWeek + 7); // Sunday
+      staffDateRange.value = {
+        from: start_date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+        to: end_date.toISOString().split("T")[0],
+      };
+    }
     const response = await api.get("/api/getStaffIncomeStatistics", {
       params: {
-        start_date: start_date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
-        end_date: end_date.toISOString().split("T")[0],
+        start_date: staffDateRange.value.from, // Format date as YYYY-MM-DD
+        end_date: staffDateRange.value.to,
       },
     });
 
@@ -1583,12 +1799,12 @@ const paymentMethodConfig = {
 
 // Computed property to get top payment methods with percentages
 const topPaymentMethods = computed(() => {
-  if (!todayStatistics.value.orderGroup) {
+  if (!appointmentStatistics.value.orderGroup) {
     return [];
   }
 
-  const orderGroup = todayStatistics.value.orderGroup;
-  const totalRevenue = todayStatistics.value.total_revenue || 1; // Avoid division by zero
+  const orderGroup = appointmentStatistics.value.orderGroup;
+  const totalRevenue = appointmentStatistics.value.total_revenue || 1; // Avoid division by zero
 
   // Convert orderGroup to array and calculate percentages
   const methods = Object.entries(orderGroup)
@@ -1617,12 +1833,12 @@ const topPaymentMethods = computed(() => {
 
 // Computed property for the progress bar (showing the percentage of paid amounts excluding unpaid and voucher)
 const topPaymentMethodPercentage = computed(() => {
-  if (!todayStatistics.value.orderGroup) {
+  if (!appointmentStatistics.value.orderGroup) {
     return 0;
   }
 
-  const orderGroup = todayStatistics.value.orderGroup;
-  const totalRevenue = todayStatistics.value.total_revenue || 1;
+  const orderGroup = appointmentStatistics.value.orderGroup;
+  const totalRevenue = appointmentStatistics.value.total_revenue || 1;
 
   // Calculate total paid amount (excluding unpaid and voucher)
   const paidAmount = Object.entries(orderGroup)
@@ -1632,6 +1848,95 @@ const topPaymentMethodPercentage = computed(() => {
   // Return percentage of paid amount vs total revenue
   return totalRevenue > 0 ? (paidAmount / totalRevenue) * 100 : 0;
 });
+
+// const countries = [
+//   {
+//     name: "United States",
+//     amount: "2.45",
+//     trend: 5.8,
+//     flag: "https://flagcdn.com/us.svg",
+//   },
+//   {
+//     name: "Brazil",
+//     amount: "4.78",
+//     trend: -6.2,
+//     flag: "https://flagcdn.com/br.svg",
+//   },
+//   {
+//     name: "India",
+//     amount: "1.48",
+//     trend: 22.3,
+//     flag: "https://flagcdn.com/in.svg",
+//   },
+//   {
+//     name: "Australia",
+//     amount: "2.12",
+//     trend: -31.9,
+//     flag: "https://flagcdn.com/au.svg",
+//   },
+//   {
+//     name: "France",
+//     amount: "2.45",
+//     trend: 6.2,
+//     flag: "https://flagcdn.com/fr.svg",
+//   },
+//   {
+//     name: "China",
+//     amount: "1.90",
+//     trend: 4.8,
+//     flag: "https://flagcdn.com/cn.svg",
+//   },
+// ];
+// const marketing = [
+//   {
+//     label: "Email Messages",
+//     value: "12,346",
+//     percent: 0.3,
+//     icon: "mail",
+//     color: "green-5",
+//     bg: "bg-green-1",
+//   },
+//   {
+//     label: "Emails Opened",
+//     value: "8,734",
+//     percent: 2.1,
+//     icon: "link",
+//     color: "cyan-5",
+//     bg: "bg-cyan-1",
+//   },
+//   {
+//     label: "Links Clicked",
+//     value: "967",
+//     percent: 1.4,
+//     icon: "campaign",
+//     color: "red-5",
+//     bg: "bg-red-1",
+//   },
+//   {
+//     label: "Subscribers",
+//     value: "345",
+//     trend: 8.5,
+//     icon: "person",
+//     color: "cyan-7",
+//     bg: "bg-cyan-1",
+//   },
+//   {
+//     label: "Complaints",
+//     value: "10",
+//     percent: 1.5,
+//     icon: "report_problem",
+//     color: "red-5",
+//     bg: "bg-red-1",
+//   },
+//   {
+//     label: "Unsubscribers",
+//     value: "86",
+//     percent: 0.8,
+//     icon: "block",
+//     color: "orange-5",
+//     bg: "bg-orange-1",
+//   },
+// ];
 </script>
 
 <style scoped>

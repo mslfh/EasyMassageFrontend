@@ -291,6 +291,7 @@ function goToOmneasWebsite() {
           <!-- Dashboard - Only for Admin -->
           <q-item
             v-if="isAdminRole"
+            to="/admin/dashboard"
             active-class="q-item-no-link-highlighting"
           >
             <q-item-section avatar>
@@ -476,13 +477,13 @@ function goToOmneasWebsite() {
         <div class="absolute-bottom bg-transparent">
           <q-toolbar class="bg-white text-grey-8">
             <q-avatar
-              size="40px"
+              size="45px"
               class="q-mr-md"
               style="background-color: #f5f5f5"
               @click="zoomLeftDrawer"
             >
               <img
-                src="../assets/adminLogo.png"
+                src="../assets/adminLogo2.png"
                 alt="Logo"
               />
             </q-avatar>
