@@ -10,7 +10,13 @@
         {{ customerHistory.filter((event) => event.type === "no_show").length }}
       </q-badge>
     </q-btn>
-    <q-timeline class="q-pa-none" color="">
+    <q-btn label="Cancelled" flat color="grey ">
+      <q-badge color="red-4" text-color="white" floating>
+        {{ customerHistory.filter((event) => event.status === "cancelled").length }}
+      </q-badge>
+    </q-btn>
+
+    <q-timeline class="q-pa-none">
       <q-timeline-entry
         v-for="event in customerHistory"
         :key="event.id"
@@ -64,22 +70,26 @@
               }}
             </span>
           </div>
-
-
           <div class="row q-pa-none">
             <span>
-              * Booking Time:
+              * Booked :
               {{
-                event.booking_time.slice(0, 16).replace("T", " ")
+                new Date(event.created_at).toLocaleString("en-AU", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
               }}
             </span>
-          </div>
-
-          <div class="row q-pa-none">
-            <span>
-              *  Submitted At :
-              {{ event.created_at.slice(0, 16).replace("T", " ") }}
-            </span>
+            <q-badge
+              v-if="event.tag === 'staff_created'"
+              outline
+              size="12px"
+              dense
+              color="deep-orange-3"
+              label="staff"
+            />
           </div>
           <div
             class="text-grey"
@@ -92,9 +102,10 @@
         </div>
         <template v-slot:subtitle>
           <div class="row q-pa-none">
-            <q-lable class="col-8 text-subtitle2 text-weight-bold">{{
+            <div class="col-8 text-subtitle2 text-weight-bold">{{
               event.booking_time.slice(0, 16)
-            }}</q-lable>
+            }}</div>
+            <div class="col-4 text-right">
             <q-chip
               size="12px"
               outline
@@ -103,13 +114,16 @@
                 event.status === 'finished'
                   ? 'teal-4'
                   : event.status === 'pending'
-                  ? 'red-8'
+                  ? 'deep-orange-8'
+                  : event.status === 'cancelled'
+                  ? 'red-5'
                   : 'blue-5'
               "
               :label="event.status"
               text-color="white"
               class="q-mr-sm"
             />
+            </div>
           </div>
         </template>
       </q-timeline-entry>
@@ -143,6 +157,7 @@ onMounted(async () => {
   });
 
   customerHistory.value = response.data;
+  console.log("Customer History:", customerHistory.value);
   if (customerHistory.value.length === 0) {
     $q.notify({
       type: "warning",

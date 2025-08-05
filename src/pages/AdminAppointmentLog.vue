@@ -20,10 +20,7 @@
               transition-show="scale"
               transition-hide="scale"
             >
-              <q-date
-                v-model="date"
-                mask="YYYY-MM-DD"
-              >
+              <q-date v-model="date" mask="YYYY-MM-DD">
                 <div class="row items-center justify-end">
                   <q-btn v-close-popup label="Close" color="primary" flat />
                 </div>
@@ -31,7 +28,6 @@
             </q-popup-proxy>
           </q-icon>
         </template>
-
         <template v-slot:body-cell-appointment_id="props">
           <q-td :props="props">
             <q-btn
@@ -43,10 +39,20 @@
             />
           </q-td>
         </template>
-
+        <template v-slot:body-cell-status="props">
+          <q-td :props="props">
+            <q-badge
+              :color="props.value === 'success' ? 'green' : 'red'"
+              :label="props.value"
+              outline
+              size="12px"
+              dense
+            />
+          </q-td>
+        </template>
         <template v-slot:body-cell-comments="props">
           <q-td :props="props">
-            {{ props.value || '' }}
+            {{ props.value || "" }}
           </q-td>
         </template>
       </q-table>
@@ -81,11 +87,11 @@ const columns = [
     align: "left",
     field: "description",
   },
-   {
-    name: "staff_name",
-    label: "Therapist",
+  {
+    name: "status",
+    label: "Status",
     align: "center",
-    field: "staff_name",
+    field: "status",
   },
   {
     name: "customer_name",
@@ -94,18 +100,18 @@ const columns = [
     field: "customer_name",
   },
   {
+    name: "staff_name",
+    label: "Therapist",
+    align: "center",
+    field: "staff_name",
+  },
+
+  {
     name: "service_title",
     label: "Service",
     align: "left",
     field: "service_title",
   },
-  {
-    name: "status",
-    label: "Status",
-    align: "center",
-    field: "status",
-  },
-
   {
     name: "comments",
     label: "Comments",
@@ -118,15 +124,15 @@ const columns = [
     align: "left",
     field: "booking_time",
     format: (val) => {
-      if (!val) return '';
+      if (!val) return "";
       const date = new Date(val);
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
       });
     },
     sortable: true,
@@ -137,15 +143,15 @@ const columns = [
     align: "left",
     field: "created_at",
     format: (val) => {
-      if (!val) return '';
+      if (!val) return "";
       const date = new Date(val);
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
       });
     },
     sortable: true,
@@ -154,7 +160,7 @@ const columns = [
 
 const goToAppointmentDetail = (appointmentId) => {
   router.push({
-    path: '/admin/appointment/detail',
+    path: "/admin/appointment/detail",
     query: { id: appointmentId },
   });
 };
@@ -168,17 +174,21 @@ const fetchLogs = async () => {
         end_date: date.value,
       },
     });
-    if (response.data && response.data.success && Array.isArray(response.data.data)) {
+    if (
+      response.data &&
+      response.data.success &&
+      Array.isArray(response.data.data)
+    ) {
       logs.value = response.data.data;
     } else {
       logs.value = [];
     }
   } catch (error) {
-    console.error('Error fetching appointment logs:', error);
+    console.error("Error fetching appointment logs:", error);
     logs.value = [];
     $q.notify({
-      type: 'negative',
-      message: 'Failed to fetch appointment logs'
+      type: "negative",
+      message: "Failed to fetch appointment logs",
     });
   } finally {
     loading.value = false;

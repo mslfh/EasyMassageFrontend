@@ -1057,6 +1057,7 @@ function openEditEventDialog(event: AppintmentEvent) {
     customer_id: event.customer_id,
     booking_date: event.date,
     booking_time: event.time,
+    duration: event.service_duration,
     customer_name: event.customer_name,
     service: {
       id: event.service_id,

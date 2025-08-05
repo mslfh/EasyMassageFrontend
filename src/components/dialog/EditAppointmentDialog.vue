@@ -8,7 +8,10 @@
     <q-card :style="$q.screen.gt.md ? 'min-width: 850px' : 'min-width: 100%'">
       <!-- Deleted Status Banner -->
       <q-banner
-        v-if="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+        v-if="
+          editEventForm.status === 'cancelled' ||
+          editEventForm.status === 'deleted'
+        "
         class="bg-red-1 text-red-8 q-pa-md"
         dense
       >
@@ -17,7 +20,8 @@
         </template>
         <div class="text-weight-bold">
           <q-icon name="delete_forever" class="q-mr-sm" />
-          This appointment has been {{ editEventForm.status === 'cancelled' ? 'cancelled' : 'deleted' }}
+          This appointment has been
+          {{ editEventForm.status === "cancelled" ? "cancelled" : "deleted" }}
         </div>
         <div class="text-caption">
           This appointment is no longer active and cannot be modified.
@@ -62,7 +66,7 @@
               >
                 <q-item-label class="q-ma-sm">
                   <q-icon size="xs" name="delete" />
-                  Delete
+                  CANCEL
                 </q-item-label>
               </q-item>
             </q-list>
@@ -97,7 +101,10 @@
               option-value="id"
               option-label="name"
               clearable
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
               @update:model-value="
                 fetchAvailableBookingTime(editEventForm.booking_date)
               "
@@ -106,7 +113,6 @@
               v-model="editEventForm.booking_date"
               label="Select Date"
               mask="####-##-##"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
             >
               <template v-slot:prepend>
                 <q-icon name="event" class="cursor-pointer">
@@ -144,10 +150,26 @@
                 v-model="editEventForm.booking_time"
                 outlined
                 type="time"
-                :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+                :disable="
+                  editEventForm.status === 'cancelled' ||
+                  editEventForm.status === 'deleted'
+                "
+              />
+              <q-label class="text-subtitle2 text-grey-9"
+                >Duration (minutes):</q-label
+              >
+
+              <q-input
+                v-model="editEventForm.duration"
+                outlined
+                dense
+                type="number"
+                suffix="min"
+                :step="10"
               />
               <q-separator class="q-my-md" />
             </div>
+
             <q-scroll-area style="height: 200px">
               <q-chip
                 v-for="item in available_booking_time"
@@ -256,33 +278,51 @@
             <q-input
               v-model="editEventForm.customer_name"
               label="Customer Name"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
             <q-input
               v-model="editEventForm.customer_first_name"
               label="First Name"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
             <q-input
               v-model="editEventForm.customer_last_name"
               label="Last Name"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
             <q-input
               v-model="editEventForm.customer_email"
               label="Email"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
             <q-input
               v-model="editEventForm.customer_phone"
               label="Phone"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
             <q-input
               type="textarea"
               v-model="editEventForm.comments"
               label="Comments"
-              :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+              :disable="
+                editEventForm.status === 'cancelled' ||
+                editEventForm.status === 'deleted'
+              "
             />
           </q-card-section>
 
@@ -352,7 +392,10 @@
           label="Save"
           color="positive"
           @click="saveEditedEvent"
-          :disable="editEventForm.status === 'cancelled' || editEventForm.status === 'deleted'"
+          :disable="
+            editEventForm.status === 'cancelled' ||
+            editEventForm.status === 'deleted'
+          "
         />
       </q-card-actions>
     </q-card>
@@ -562,15 +605,15 @@ async function cancelAppointment() {
   try {
     // Show confirmation dialog
     $q.dialog({
-      title: "Delete Appointment",
-      message: "Are you sure you want to permanently delete this appointment? This action cannot be undone.",
+      title: "Cancel Appointment",
+      message: "Are you sure you want to cancel this appointment?",
       cancel: {
         color: "grey-7",
         label: "Cancel",
       },
       ok: {
         color: "red-5",
-        label: "Delete Permanently",
+        label: "Confirm",
       },
       persistent: true,
     })
@@ -581,7 +624,7 @@ async function cancelAppointment() {
 
         if (response.status === 200) {
           // Update the local status to show it's deleted
-          editEventForm.value.status = 'cancelled';
+          editEventForm.value.status = "cancelled";
 
           $q.notify({
             type: "negative",
@@ -591,11 +634,11 @@ async function cancelAppointment() {
             icon: "delete_forever",
             actions: [
               {
-                label: 'Dismiss',
-                color: 'white',
-                handler: () => {}
-              }
-            ]
+                label: "Dismiss",
+                color: "white",
+                handler: () => {},
+              },
+            ],
           });
         }
         emit("delete");
