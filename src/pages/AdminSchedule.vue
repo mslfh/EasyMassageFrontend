@@ -139,7 +139,7 @@ const schedule = ref({
   break_end_time: "",
 });
 
-const timeRangeModel = ref({ min: 8, max: 20 });
+const timeRangeModel = ref({ min: 9, max: 20 });
 
 const eventsMap = computed(() => {
   const map = {};
