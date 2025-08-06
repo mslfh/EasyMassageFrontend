@@ -67,7 +67,7 @@
         <template v-slot:body-cell-attachment="props">
           <q-td class="text-center">
             <AttachmentViewer
-              :attachments="props.row.medical_attachment_path "
+              :attachments="props.row.medical_attachment_path"
             />
           </q-td>
         </template>
@@ -105,7 +105,13 @@ const columns = [
     sortable: true,
     field: "first_name",
   },
-  { name: "last_name", label: "Last Name",sortable: true, align: "left", field: "last_name" },
+  {
+    name: "last_name",
+    label: "Last Name",
+    sortable: true,
+    align: "left",
+    field: "last_name",
+  },
   { name: "phone", label: "Phone", align: "left", field: "phone" },
   {
     name: "attachment",
@@ -156,6 +162,11 @@ const onRequest = (props) => {
   const startRow = (page - 1) * rowsPerPage;
   const count = rowsPerPage === 0 ? pagination.value.rowsNumber : rowsPerPage;
   fetchProfiles(startRow, count, filterValue, sortBy, descending);
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  pagination.value.sortBy = sortBy;
+  pagination.value.descending = descending;
+  loading.value = false;
 };
 
 function formatCreatedAt(dateStr) {

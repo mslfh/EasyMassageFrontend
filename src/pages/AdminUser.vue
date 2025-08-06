@@ -317,6 +317,11 @@ const onRequest = (props) => {
   const startRow = (page - 1) * rowsPerPage;
   const count = rowsPerPage === 0 ? pagination.value.rowsNumber : rowsPerPage;
   fetchUsers(startRow, count, filterValue, sortBy, descending);
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  pagination.value.sortBy = sortBy;
+  pagination.value.descending = descending;
+  loading.value = false;
 };
 
 onMounted(() => {

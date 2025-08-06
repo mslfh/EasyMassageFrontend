@@ -538,6 +538,11 @@ const onRequest = (props) => {
   const startRow = (page - 1) * rowsPerPage;
   const count = rowsPerPage === 0 ? pagination.value.rowsNumber : rowsPerPage;
   fetchVouchers(startRow, count, filterValue, sortBy, descending);
+  pagination.value.page = page;
+  pagination.value.rowsPerPage = rowsPerPage;
+  pagination.value.sortBy = sortBy;
+  pagination.value.descending = descending;
+  loading.value = false;
 };
 
 onMounted(() => {
@@ -624,7 +629,10 @@ const submitBulkVoucher = async () => {
     delete payload.valid_until_option;
     delete payload._remaining_amount_touched;
     await api.post("/api/vouchers/bulk", payload);
-    $q.notify({ type: "positive", message: "Bulk vouchers added successfully" });
+    $q.notify({
+      type: "positive",
+      message: "Bulk vouchers added successfully",
+    });
     showAddDialog.value = false;
     bulkForm.value = {
       count: 10,
