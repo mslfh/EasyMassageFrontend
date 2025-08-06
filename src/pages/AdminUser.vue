@@ -349,15 +349,15 @@ const editUser = (row) => {
 
 const updateUser = async () => {
   try {
-    const formData = new FormData();
-    formData.append("_method", "PUT");
-    Object.keys(editForm.value).forEach((key) => {
-      if (key !== "id") {
-        formData.append(key, editForm.value[key]);
+    await api.put(`/api/user/${editForm.value.id}`,
+      {
+        name: editForm.value.name,
+        first_name: editForm.value.first_name,
+        last_name: editForm.value.last_name,
+        email: editForm.value.email,
+        phone: editForm.value.phone,
       }
-    });
-    await api.post(`/api/user/${editForm.value.id}`, formData);
-
+    );
     // Instead of updating users.value directly, refresh table via onRequest
     onRequest({
       pagination: pagination.value,
