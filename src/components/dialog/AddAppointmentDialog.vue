@@ -246,25 +246,32 @@
       <q-linear-progress :value="1.0" color="pink" />
       <q-card-section>
         <div class="text-h6">
-          Take a Break - {{ addAppointmentForm.booking_time }}
+          Break for {{ selectedStaff.name }} -
+          {{ addAppointmentForm.booking_time }}
         </div>
         <q-radio
           v-model="takeBreakDialog.selectedDuration"
           val="10"
-          label="10 minutes"
+          label="10 mins"
           @update:model-value="assumeBreakEvent(10)"
         />
         <q-radio
           v-model="takeBreakDialog.selectedDuration"
           val="20"
-          label="20 minutes"
+          label="20 mins"
           @update:model-value="assumeBreakEvent(20)"
         />
         <q-radio
           v-model="takeBreakDialog.selectedDuration"
           val="30"
-          label="30 minutes"
+          label="30 mins"
           @update:model-value="assumeBreakEvent(30)"
+        />
+         <q-radio
+          v-model="takeBreakDialog.selectedDuration"
+          val="60"
+          label="60 mins"
+          @update:model-value="assumeBreakEvent(60)"
         />
         <q-input
           v-model="takeBreakDialog.customDuration"
@@ -277,6 +284,16 @@
             takeBreakDialog.selectedDuration = null;
             assumeBreakEvent(takeBreakDialog.customDuration);
           "
+        />
+
+        <q-input
+          class="q-mt-sm"
+          v-model="takeBreakDialog.comments"
+          label="Remark"
+          type="text"
+          autogrow
+          outlined
+          dense
         />
       </q-card-section>
       <q-card-actions align="right">
@@ -349,8 +366,8 @@
     v-if="isAttachmentDialogOpen"
     :profile="profile"
     @close="
-    fetchUserProfile();
-    isAttachmentDialogOpen = false;
+      fetchUserProfile();
+      isAttachmentDialogOpen = false;
     "
   />
 </template>
@@ -641,6 +658,7 @@ const takeBreakDialog = ref({
   visible: false,
   selectedDuration: null as number | null,
   customDuration: "",
+  comments: "",
 });
 
 const assumeBreakId = ref<number | null>(null);
@@ -689,6 +707,7 @@ function assumeBreakEvent(duration: number) {
 }
 
 async function confirmTakeBreak() {
+  breakEvent.value.comments = takeBreakDialog.value.comments;
   const duration =
     takeBreakDialog.value.selectedDuration ||
     parseInt(takeBreakDialog.value.customDuration, 10);
@@ -701,6 +720,7 @@ async function confirmTakeBreak() {
     });
     return;
   }
+  console.log(breakEvent.value);
 
   const payload = {
     ...breakEvent.value,

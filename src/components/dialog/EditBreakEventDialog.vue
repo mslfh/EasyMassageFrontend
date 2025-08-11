@@ -45,6 +45,17 @@
           outlined
           dense
         />
+
+        <q-input
+        class="q-mt-sm"
+          v-model="editTakeBreakDialog.payload.comments"
+          label="Remark"
+          type="text"
+          autogrow
+          outlined
+          dense
+        />
+
       </q-card-section>
       <q-card-actions align="right">
         <q-btn
@@ -81,7 +92,8 @@ const $q = useQuasar();
 const editTakeBreakDialog = ref({
   id: 0,
   visible: true,
-  payload: {},
+  payload: {
+  },
 });
 
 const emit = defineEmits(["close","delete"]);
@@ -90,9 +102,10 @@ onMounted(() => {
   editTakeBreakDialog.value.visible = true;
   editTakeBreakDialog.value.id = props.editEventForm.id;
   editTakeBreakDialog.value.payload = {
-    service_duration: 0,
+    service_duration: props.editEventForm.duration,
     time: props.editEventForm.booking_time,
     date: props.editEventForm.booking_date,
+    comments: props.editEventForm.comments,
   };
 });
 
