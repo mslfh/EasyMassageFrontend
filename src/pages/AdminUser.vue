@@ -106,7 +106,7 @@
           <div class="text-h6">Edit User</div>
         </q-card-section>
         <q-card-section>
-          <q-input v-model="editForm.name" label="Username" />
+          <q-input v-model="editForm.name" label="Username" @update:model-value="autoFillName()" />
           <q-input v-model="editForm.first_name" label="First Name" />
           <q-input v-model="editForm.last_name" label="Last Name" />
           <q-input v-model="editForm.phone" label="Phone" />
@@ -449,4 +449,13 @@ const fetchCustomerHistory = async (userId) => {
   });
   isHistoryDialogOpen.value = true;
 };
+
+function autoFillName() {
+  const fullName = editForm.value.name;
+  if (fullName) {
+    const nameParts = fullName.split(" ");
+    editForm.value.first_name = nameParts[0] || "";
+    editForm.value.last_name = nameParts.slice(1).join(" ") || "";
+  }
+}
 </script>

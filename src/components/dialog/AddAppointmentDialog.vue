@@ -137,7 +137,8 @@
             <UserSearch @user-selected="onUserSelectedCustomer" />
             <q-input
               v-model="addAppointmentForm.customer_service[0].customer_name"
-              label="Customer Name"
+              label="Customer Name "
+              hint="Auto fill by Walk-in if not provided"
               @update:model-value="autoFillName()"
             />
             <q-input
@@ -154,7 +155,7 @@
             />
             <q-input
               v-model="addAppointmentForm.customer_phone"
-              label="Phone"
+              label="* Phone"
             />
             <q-input
               autogrow
@@ -585,12 +586,12 @@ async function addAppointment() {
 
     if (addAppointmentForm.value.customer_service[0]["customer_name"] === "") {
       $q.notify({
-        type: "negative",
-        message: "Customer Name Can not be empty!",
+        type: "info",
+        message: "Default name is 'Walk-in' now, edit later with phone number.",
         position: "top",
-        timeout: 2000,
+        timeout: 1000,
       });
-      return;
+      addAppointmentForm.value.customer_service[0]["customer_name"] = "Walk-in";
     }
     if (
       addAppointmentForm.value.is_first &&
@@ -598,7 +599,7 @@ async function addAppointment() {
     ) {
       $q.notify({
         type: "negative",
-        message: "The Phone Number can not be empty when saving!",
+        message: "Phone number required to save customer info",
         position: "top",
         timeout: 2000,
       });

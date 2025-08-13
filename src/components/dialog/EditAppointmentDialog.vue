@@ -282,6 +282,7 @@
                 editEventForm.status === 'cancelled' ||
                 editEventForm.status === 'deleted'
               "
+               @update:model-value="autoFillName()"
             />
             <q-input
               v-model="editEventForm.customer_first_name"
@@ -519,6 +520,16 @@ onMounted(() => {
   fetchAvailableBookingTime();
   fetchUserProfile();
 });
+
+function autoFillName() {
+  const fullName = editEventForm.value.customer_name;
+  if (fullName) {
+    const nameParts = fullName.split(" ");
+    editEventForm.value.customer_first_name = nameParts[0] || "";
+    editEventForm.value.customer_last_name =
+      nameParts.slice(1).join(" ") || "";
+  }
+}
 
 // UserProfile
 const profile_id = ref(0);

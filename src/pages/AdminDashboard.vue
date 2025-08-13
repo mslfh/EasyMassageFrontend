@@ -195,7 +195,9 @@
                       <div class="row q-gutter-lg">
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{ appointmentAnalysisStatistics.total_appointments }}
+                            {{
+                              appointmentAnalysisStatistics.total_appointments
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -219,7 +221,9 @@
                         </div>
                         <div class="col">
                           <div class="text-h6 text-white">
-                            {{ appointmentAnalysisStatistics.completed_appointments }}
+                            {{
+                              appointmentAnalysisStatistics.completed_appointments
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -228,7 +232,9 @@
                             Completed
                           </div>
                           <div class="text-body2 text-white q-mt-sm">
-                            {{ appointmentAnalysisStatistics.pending_appointments }}
+                            {{
+                              appointmentAnalysisStatistics.pending_appointments
+                            }}
                           </div>
                           <div
                             class="text-body2 text-white"
@@ -881,73 +887,65 @@
         </q-card>
       </div>
 
-      <!-- Sales by Staff Card -->
+      <!-- Daily sales Card -->
       <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <q-card
           class="col bg-white q-pa-lg shadow-1 card-min"
           style="border-radius: 20px"
         >
           <div class="row items-center q-mb-md">
-            <div class="text-h6 text-grey-6">Sales by Staff</div>
+            <div class="text-h6 text-grey-6">Sale Analytics</div>
             <q-btn flat round icon="more_vert" class="q-ml-auto" />
           </div>
-          <div class="text-subtitle2 text-grey-5 q-mb-md">
-            Monthly Sales Overview
+          <div class="row text-subtitle2 text-grey-5 q-mb-md">
+            <div class="col-3"> ltem type</div>
+            <div class="col-3"> Sales qty</div>
+            <div class="col-3"> Refund gty</div>
+            <div class="col-3"> Gross total</div>
           </div>
           <div
-            v-for="country in countries"
-            :key="country.name"
+            v-for="item in saleAnalytics"
+            :key="item.label"
             class="row items-center q-mb-sm"
           >
-            <img
-              :src="country.flag"
-              alt="flag"
-              style="
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-              "
-            />
-            <div class="q-ml-md">
-              <div class="text-h6 text-weight-bold text-grey-4">
-                ${{ country.amount }}
-              </div>
-              <div class="text-caption text-grey-5">{{ country.name }}</div>
+            <div
+              :class="item.bg"
+              class="flex flex-center"
+              style="width: 40px; height: 40px; border-radius: 12px"
+            >
+              <q-icon :name="item.icon" :color="item.color" size="24px" />
             </div>
-            <div class="q-ml-auto flex items-center">
-              <q-icon
-                :name="country.trend > 0 ? 'north' : 'south'"
-                :color="country.trend > 0 ? 'green-5' : 'red-5'"
-                size="16px"
-              />
-              <span
-                :class="country.trend > 0 ? 'text-green-5' : 'text-red-5'"
-                class="q-ml-xs"
-                >{{ Math.abs(country.trend) }}%</span
-              >
+            <div class="q-ml-md text-grey-4" style="min-width: 120px">
+              {{ item.label }}
+            </div>
+            <div class="q-ml-auto text-h6 text-weight-bold text-grey-6">
+              {{ item.value }}
+            </div>
+            <div class="q-ml-md" :class="item.trend > 0 ? 'text-green-5' : ''">
+              {{
+                item.trend
+                  ? (item.trend > 0 ? "+" : "") + item.trend + "%"
+                  : item.percent + "%"
+              }}
             </div>
           </div>
         </q-card>
       </div>
-
-      <!-- Monthly Appointment Performance Card -->
+      <!-- Cash Movement Summary -->
       <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <q-card
           class="col bg-white q-pa-lg shadow-1 card-min"
           style="border-radius: 20px"
         >
           <div class="row items-center q-mb-md">
-            <div class="text-h6 text-grey-6">
-              Monthly Appointment Performance
-            </div>
+            <div class="text-h6 text-grey-6">Sale Analytics</div>
             <q-btn flat round icon="more_vert" class="q-ml-auto" />
           </div>
           <div class="text-subtitle2 text-grey-5 q-mb-md">
             4,210 Social Visitor
           </div>
           <div
-            v-for="item in marketing"
+            v-for="item in saleAnalytics"
             :key="item.label"
             class="row items-center q-mb-sm"
           >
@@ -1468,10 +1466,12 @@ const formatUpdateTime = () => {
 
 const startDate = ref("");
 const endDate = ref("");
+
 onMounted(() => {
   fetchTodayStatistics();
   fetchStaffIncomeStatistics();
   fetchAnalyticsStatistics();
+  fetchSalesStatistics();
   userRole.value = getUserRole();
 });
 
@@ -1556,7 +1556,8 @@ async function fetchAnalyticsStatistics() {
 
       // Update appointment statistics
       if (response.data.appointment_statistics) {
-        appointmentAnalysisStatistics.value = response.data.appointment_statistics;
+        appointmentAnalysisStatistics.value =
+          response.data.appointment_statistics;
       }
 
       // Update revenue statistics
@@ -1849,94 +1850,69 @@ const topPaymentMethodPercentage = computed(() => {
   return totalRevenue > 0 ? (paidAmount / totalRevenue) * 100 : 0;
 });
 
-// const countries = [
-//   {
-//     name: "United States",
-//     amount: "2.45",
-//     trend: 5.8,
-//     flag: "https://flagcdn.com/us.svg",
-//   },
-//   {
-//     name: "Brazil",
-//     amount: "4.78",
-//     trend: -6.2,
-//     flag: "https://flagcdn.com/br.svg",
-//   },
-//   {
-//     name: "India",
-//     amount: "1.48",
-//     trend: 22.3,
-//     flag: "https://flagcdn.com/in.svg",
-//   },
-//   {
-//     name: "Australia",
-//     amount: "2.12",
-//     trend: -31.9,
-//     flag: "https://flagcdn.com/au.svg",
-//   },
-//   {
-//     name: "France",
-//     amount: "2.45",
-//     trend: 6.2,
-//     flag: "https://flagcdn.com/fr.svg",
-//   },
-//   {
-//     name: "China",
-//     amount: "1.90",
-//     trend: 4.8,
-//     flag: "https://flagcdn.com/cn.svg",
-//   },
-// ];
-// const marketing = [
-//   {
-//     label: "Email Messages",
-//     value: "12,346",
-//     percent: 0.3,
-//     icon: "mail",
-//     color: "green-5",
-//     bg: "bg-green-1",
-//   },
-//   {
-//     label: "Emails Opened",
-//     value: "8,734",
-//     percent: 2.1,
-//     icon: "link",
-//     color: "cyan-5",
-//     bg: "bg-cyan-1",
-//   },
-//   {
-//     label: "Links Clicked",
-//     value: "967",
-//     percent: 1.4,
-//     icon: "campaign",
-//     color: "red-5",
-//     bg: "bg-red-1",
-//   },
-//   {
-//     label: "Subscribers",
-//     value: "345",
-//     trend: 8.5,
-//     icon: "person",
-//     color: "cyan-7",
-//     bg: "bg-cyan-1",
-//   },
-//   {
-//     label: "Complaints",
-//     value: "10",
-//     percent: 1.5,
-//     icon: "report_problem",
-//     color: "red-5",
-//     bg: "bg-red-1",
-//   },
-//   {
-//     label: "Unsubscribers",
-//     value: "86",
-//     percent: 0.8,
-//     icon: "block",
-//     color: "orange-5",
-//     bg: "bg-orange-1",
-//   },
-// ];
+const saleAnalytics = [
+  {
+    label: "Email Messages",
+    value: "12,346",
+    percent: 0.3,
+    icon: "mail",
+    color: "green-5",
+    bg: "bg-green-1",
+  },
+  {
+    label: "Emails Opened",
+    value: "8,734",
+    percent: 2.1,
+    icon: "link",
+    color: "cyan-5",
+    bg: "bg-cyan-1",
+  },
+  {
+    label: "Links Clicked",
+    value: "967",
+    percent: 1.4,
+    icon: "campaign",
+    color: "red-5",
+    bg: "bg-red-1",
+  },
+  {
+    label: "Subscribers",
+    value: "345",
+    trend: 8.5,
+    icon: "person",
+    color: "cyan-7",
+    bg: "bg-cyan-1",
+  },
+  {
+    label: "Complaints",
+    value: "10",
+    percent: 1.5,
+    icon: "report_problem",
+    color: "red-5",
+    bg: "bg-red-1",
+  },
+  {
+    label: "Unsubscribers",
+    value: "86",
+    percent: 0.8,
+    icon: "block",
+    color: "orange-5",
+    bg: "bg-orange-1",
+  },
+];
+
+async function fetchSalesStatistics() {
+  try {
+    const response = await api.get("/api/getSalesStatistics");
+
+    if (response.data) {
+      saleAnalytics.value = response.data || [];
+      console.log("Today's statistics:", saleAnalytics.value);
+    }
+  } catch (error) {
+    console.error("Error fetching today's statistics:", error);
+  }
+}
 </script>
 
 <style scoped>
