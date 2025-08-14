@@ -888,86 +888,282 @@
       </div>
 
       <!-- Daily sales Card -->
-      <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
         <q-card
-          class="col bg-white q-pa-lg shadow-1 card-min"
+          class="fit bg-white q-pa-lg shadow-1 card-min column"
           style="border-radius: 20px"
         >
           <div class="row items-center q-mb-md">
-            <div class="text-h6 text-grey-6">Sale Analytics</div>
-            <q-btn flat round icon="more_vert" class="q-ml-auto" />
+            <div class="col">
+              <div class="text-h6 text-grey-6">Sale Analytics</div>
+              <div class="text-subtitle2 text-grey-5">
+                {{ formattedSalesDateRange }}
+              </div>
+            </div>
+            <q-btn flat round icon="more_vert" class="q-ml-auto">
+              <q-menu>
+                <q-list style="min-width: 300px">
+                  <q-item-label header class="text-subtitle1"
+                    >* Select Date Range</q-item-label
+                  >
+                  <q-item>
+                    <q-item-section>
+                      <q-date
+                        v-model="salesDateRange"
+                        range
+                        color="deep-purple-4"
+                        class="no-shadow"
+                        @update:model-value="updateSalesDateRange"
+                      />
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item clickable v-close-popup @click="resetSalesDateRange">
+                    <q-item-section>
+                      <q-item-label class="text-grey-6"
+                        >Reset to Today
+                      </q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-icon name="refresh" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </div>
-          <div class="row text-subtitle2 text-grey-5 q-mb-md">
-            <div class="col-3"> ltem type</div>
-            <div class="col-3"> Sales qty</div>
-            <div class="col-3"> Refund gty</div>
-            <div class="col-3"> Gross total</div>
-          </div>
-          <div
-            v-for="item in saleAnalytics"
-            :key="item.label"
-            class="row items-center q-mb-sm"
-          >
+
+          <!-- Sales Summary Section -->
+          <div class="col q-mb-lg">
+            <div class="row text-subtitle2 text-grey-5 q-mb-md">
+              <div class="col-3">Item Type</div>
+              <div class="col-2 text-center">Qty</div>
+              <div class="col-2 text-center">Pricing Fees</div>
+              <div class="col-2 text-center">Receivable</div>
+              <div class="col-3 text-center">Collected</div>
+            </div>
+
             <div
-              :class="item.bg"
-              class="flex flex-center"
-              style="width: 40px; height: 40px; border-radius: 12px"
+              v-for="item in saleAnalytics"
+              :key="item.key"
+              class="row items-center q-mb-sm"
             >
-              <q-icon :name="item.icon" :color="item.color" size="24px" />
+              <div class="col-3 flex items-center">
+                <div
+                  :class="item.bg"
+                  class="flex flex-center q-mr-sm"
+                  style="width: 32px; height: 32px; border-radius: 8px"
+                >
+                  <q-icon :name="item.icon" :color="item.color" size="18px" />
+                </div>
+                <div class="text-body2 text-grey-6">{{ item.label }}</div>
+              </div>
+              <div
+                class="col-2 text-body1 text-weight-bold text-grey-7 text-center"
+              >
+                {{ item.sales_qty }}
+              </div>
+              <div class="col-2 text-body1 text-grey-6 text-center">
+                ${{ item.pricing_fees.toFixed(2) }}
+              </div>
+              <div class="col-2 text-body1 text-grey-6 text-center">
+                ${{ item.receivable_fees.toFixed(2) }}
+              </div>
+              <div class="col-3 text-body1 text-grey-6 text-center">
+                ${{ item.payments_collected.toFixed(2) }}
+              </div>
             </div>
-            <div class="q-ml-md text-grey-4" style="min-width: 120px">
-              {{ item.label }}
-            </div>
-            <div class="q-ml-auto text-h6 text-weight-bold text-grey-6">
-              {{ item.value }}
-            </div>
-            <div class="q-ml-md" :class="item.trend > 0 ? 'text-green-5' : ''">
-              {{
-                item.trend
-                  ? (item.trend > 0 ? "+" : "") + item.trend + "%"
-                  : item.percent + "%"
-              }}
+
+            <!-- Total Row -->
+            <div
+              class="row items-center q-py-sm q-px-xs q-mt-md"
+              style="border-top: 2px solid #e0e0e0"
+            >
+              <div class="col-3">
+                <div class="text-body1 text-weight-bold text-grey-8">Total</div>
+              </div>
+              <div class="col-2 text-center">
+                <div class="text-body1 text-weight-bold text-grey-8">
+                  {{ saleAnalyticsTotals.total_qty }}
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div class="text-body1 text-weight-bold text-grey-8">
+                  ${{ saleAnalyticsTotals.total_pricing_fees.toFixed(2) }}
+                </div>
+              </div>
+              <div class="col-2 text-center">
+                <div class="text-body1 text-weight-bold text-grey-8">
+                  ${{ saleAnalyticsTotals.total_receivable_fees.toFixed(2) }}
+                </div>
+              </div>
+              <div class="col-3 text-center">
+                <div class="text-body1 text-weight-bold text-grey-8">
+                  ${{ saleAnalyticsTotals.total_payments_collected.toFixed(2) }}
+                </div>
+              </div>
             </div>
           </div>
         </q-card>
       </div>
-      <!-- Cash Movement Summary -->
-      <div v-if="false" class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+
+      <!-- Money Summary -->
+      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <q-card
+          class="fit bg-white q-pa-lg shadow-1 card-min"
+          style="border-radius: 20px"
+        >
+          <div class="row items-center q-mb-md">
+            <div class="col">
+              <div class="text-h6 text-grey-6">Payment Summary</div>
+              <div class="text-subtitle2 text-grey-5">
+                Payment methods breakdown
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Methods Summary -->
+          <div class="q-mb-lg">
+            <!-- Table Header -->
+            <div
+              class="row text-subtitle2 text-grey-5 q-mb-md q-pb-sm"
+              style="border-bottom: 1px solid #e0e0e0"
+            >
+              <div class="col-8">Payment Type</div>
+              <div class="col-4 text-center">Amount</div>
+            </div>
+
+            <!-- Table Rows -->
+            <div
+              v-for="method in paymentMethodSummary"
+              :key="method.key"
+              class="row items-center q-py-sm q-px-xs"
+              style="border-bottom: 1px solid #f0f0f0"
+            >
+              <div class="col-8 flex items-center">
+                <q-icon
+                  :name="method.icon"
+                  :color="method.iconColor"
+                  size="sm"
+                  class="q-mr-md"
+                />
+                <div class="text-body2 text-grey-7">{{ method.label }}</div>
+              </div>
+              <div class="col-4 text-center">
+                <div
+                  class="text-h6 text-weight-bold"
+                  :class="`text-${method.iconColor.replace('-5', '-6')}`"
+                >
+                  ${{ method.amount.toFixed(2) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Row (if needed) -->
+            <div
+              class="row items-center q-py-sm q-px-xs q-mt-md"
+              style="border-top: 2px solid #e0e0e0"
+            >
+              <div class="col-8">
+                <div class="text-body1 text-weight-bold text-grey-8">
+                  Total Paid
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="text-h6 text-weight-bold text-grey-8">
+                  ${{
+                    paymentMethodSummary
+                      .filter((method) => method.key !== "unpaid")
+                      .reduce((sum, method) => sum + method.amount, 0)
+                      .toFixed(2)
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </q-card>
+      </div>
+
+      <!-- Services Mismatch Card -->
+      <div
+        v-if="
+          salesData.servicesMismatch && salesData.servicesMismatch.length > 0
+        "
+        class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+      >
         <q-card
           class="col bg-white q-pa-lg shadow-1 card-min"
           style="border-radius: 20px"
         >
           <div class="row items-center q-mb-md">
-            <div class="text-h6 text-grey-6">Sale Analytics</div>
-            <q-btn flat round icon="more_vert" class="q-ml-auto" />
+            <div class="col">
+              <div class="text-h6 text-grey-6">Services Mismatch</div>
+              <div class="text-subtitle2 text-grey-5">
+                Appointments with pricing discrepancies
+              </div>
+            </div>
+            <div class="col-auto">
+              <q-badge
+                color="orange-2"
+                text-color="orange-8"
+                :label="salesData.servicesMismatch.length"
+              />
+            </div>
           </div>
-          <div class="text-subtitle2 text-grey-5 q-mb-md">
-            4,210 Social Visitor
-          </div>
-          <div
-            v-for="item in saleAnalytics"
-            :key="item.label"
-            class="row items-center q-mb-sm"
-          >
+
+          <!-- Mismatch List -->
+          <div class="q-mb-sm" style="max-height: 400px; overflow-y: auto">
             <div
-              :class="item.bg"
-              class="flex flex-center"
-              style="width: 40px; height: 40px; border-radius: 12px"
+              v-for="mismatch in salesData.servicesMismatch"
+              :key="mismatch.appointment_id"
+              class="q-pa-md q-mb-sm border rounded-borders"
+              style="border: 1px solid #e0e0e0"
             >
-              <q-icon :name="item.icon" :color="item.color" size="24px" />
-            </div>
-            <div class="q-ml-md text-grey-4" style="min-width: 120px">
-              {{ item.label }}
-            </div>
-            <div class="q-ml-auto text-h6 text-weight-bold text-grey-6">
-              {{ item.value }}
-            </div>
-            <div class="q-ml-md" :class="item.trend > 0 ? 'text-green-5' : ''">
-              {{
-                item.trend
-                  ? (item.trend > 0 ? "+" : "") + item.trend + "%"
-                  : item.percent + "%"
-              }}
+              <div class="row items-center">
+                <div class="col-9">
+                  <div
+                    class="text-body1 text-weight-medium text-grey-8 q-mb-xs"
+                  >
+                    {{ mismatch.service_title }} - {{ mismatch.staff_name }}
+                  </div>
+                  <div class="text-body2 text-grey-6 q-mb-xs">
+                    {{ mismatch.customer_name }} ~ {{ new Date(mismatch.booking_time).toLocaleDateString() }}
+                    {{ new Date(mismatch.booking_time).toLocaleTimeString() }}
+                  </div>
+                  <div class="row q-gutter-md">
+                    <div class="text-body2">
+                      <span class="text-grey-5">Pricing:</span>
+                      <span class="text-weight-bold text-grey-7">
+                        ${{ mismatch.pricing_fees }}</span
+                      >
+                    </div>
+                    <div class="text-body2">
+                      <span class="text-grey-5">Collected:</span>
+                      <span class="text-weight-bold text-orange-7">
+                        ${{ mismatch.total_amount }}</span
+                      >
+                    </div>
+                    <div class="text-body2">
+                      <span class="text-grey-5">Duration:</span>
+                      <span class="text-weight-bold text-grey-7">
+                        {{ mismatch.duration }}min</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3 flex justify-end">
+                  <q-btn
+                    flat
+                    round
+                    icon="o_visibility"
+                    color="deep-purple-4"
+                    size="md"
+                    @click="viewAppointmentDetail(mismatch.appointment_id)"
+                  >
+                    <q-tooltip>View Details</q-tooltip>
+                  </q-btn>
+                </div>
+              </div>
             </div>
           </div>
         </q-card>
@@ -979,9 +1175,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { api } from "boot/axios";
+import { useRouter } from "vue-router";
 import ApexCharts from "vue3-apexcharts";
 import { getUserRole } from "../utils/auth";
 
+const router = useRouter();
 const userRole = ref("");
 
 // Menu state for carousel control
@@ -1674,6 +1872,8 @@ async function fetchTodayStatistics() {
 }
 
 const staffDateRange = ref(null);
+const salesDateRange = ref(null);
+
 // Computed property to format staff date range display
 const formattedStaffDateRange = computed(() => {
   if (
@@ -1693,6 +1893,32 @@ const updateStaffDateRange = (newRange) => {
     staffDateRange.value = newRange;
     fetchStaffIncomeStatistics(); // Fetch data for the selected date range
   }
+};
+
+// Sales date range functions
+const formattedSalesDateRange = computed(() => {
+  if (
+    !salesDateRange.value ||
+    !salesDateRange.value.from ||
+    !salesDateRange.value.to
+  ) {
+    return "Today";
+  }
+  return `${formatDate(salesDateRange.value.from)} - ${formatDate(
+    salesDateRange.value.to
+  )}`;
+});
+
+const updateSalesDateRange = (newRange) => {
+  if (newRange && newRange.from && newRange.to) {
+    salesDateRange.value = newRange;
+    fetchSalesStatistics(); // Fetch data for the selected date range
+  }
+};
+
+const resetSalesDateRange = () => {
+  salesDateRange.value = null;
+  fetchSalesStatistics(); // Fetch today's data
 };
 
 async function fetchStaffIncomeStatistics() {
@@ -1850,69 +2076,182 @@ const topPaymentMethodPercentage = computed(() => {
   return totalRevenue > 0 ? (paidAmount / totalRevenue) * 100 : 0;
 });
 
-const saleAnalytics = [
-  {
-    label: "Email Messages",
-    value: "12,346",
-    percent: 0.3,
-    icon: "mail",
-    color: "green-5",
-    bg: "bg-green-1",
+const salesData = ref({
+  sales: {
+    service: {
+      sales_qty: 0,
+      pricing_fees: 0,
+      receivable_fees: 0,
+      payments_collected: 0,
+    },
+    no_show: {
+      sales_qty: 0,
+      pricing_fees: 0,
+      receivable_fees: 0,
+      payments_collected: 0,
+    },
+    cancelled: {
+      sales_qty: 0,
+      pricing_fees: 0,
+      receivable_fees: 0,
+      payments_collected: 0,
+    },
   },
-  {
-    label: "Emails Opened",
-    value: "8,734",
-    percent: 2.1,
-    icon: "link",
-    color: "cyan-5",
-    bg: "bg-cyan-1",
+  amountGroupedByPaymentMethod: {
+    unpaid: 0,
+    eft_pos: 0,
+    cash: 0,
   },
-  {
-    label: "Links Clicked",
-    value: "967",
-    percent: 1.4,
-    icon: "campaign",
-    color: "red-5",
-    bg: "bg-red-1",
-  },
-  {
-    label: "Subscribers",
-    value: "345",
-    trend: 8.5,
-    icon: "person",
-    color: "cyan-7",
-    bg: "bg-cyan-1",
-  },
-  {
-    label: "Complaints",
-    value: "10",
-    percent: 1.5,
-    icon: "report_problem",
-    color: "red-5",
-    bg: "bg-red-1",
-  },
-  {
-    label: "Unsubscribers",
-    value: "86",
-    percent: 0.8,
-    icon: "block",
-    color: "orange-5",
-    bg: "bg-orange-1",
-  },
-];
+  servicesMismatch: [],
+});
+
+// Computed property to format sales analytics for display
+const saleAnalytics = computed(() => {
+  const salesTypes = [
+    {
+      key: "service",
+      label: "Service",
+      icon: "medical_services",
+      color: "green-5",
+      bg: "bg-green-1",
+    },
+    {
+      key: "no_show",
+      label: "No Show",
+      icon: "person_off",
+      color: "orange-5",
+      bg: "bg-orange-1",
+    },
+    {
+      key: "cancelled",
+      label: "Cancelled",
+      icon: "cancel",
+      color: "red-5",
+      bg: "bg-red-1",
+    },
+  ];
+
+  return salesTypes.map((type) => {
+    const data = salesData.value.sales[type.key];
+    return {
+      ...type,
+      sales_qty: data.sales_qty,
+      pricing_fees: data.pricing_fees,
+      receivable_fees: data.receivable_fees,
+      payments_collected: data.payments_collected,
+    };
+  });
+});
+
+// Computed property to calculate sales analytics totals
+const saleAnalyticsTotals = computed(() => {
+  const analytics = saleAnalytics.value;
+  return {
+    total_qty: analytics.reduce((sum, item) => sum + item.sales_qty, 0),
+    total_pricing_fees: analytics.reduce(
+      (sum, item) => sum + item.pricing_fees,
+      0
+    ),
+    total_receivable_fees: analytics.reduce(
+      (sum, item) => sum + item.receivable_fees,
+      0
+    ),
+    total_payments_collected: analytics.reduce(
+      (sum, item) => sum + item.payments_collected,
+      0
+    ),
+  };
+});
+
+// Computed property to format payment methods for Money Summary Card
+const paymentMethodSummary = computed(() => {
+  const amountData = salesData.value.amountGroupedByPaymentMethod;
+
+  return Object.entries(amountData)
+    .map(([key, amount]) => {
+      const config = paymentMethodConfig[key] || {
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+        icon: "payment",
+        iconColor: "grey-5",
+        bgColor: "bg-grey-1",
+      };
+      return {
+        key,
+        amount: Number(amount),
+        label: config.label,
+        icon: config.icon,
+        iconColor: config.iconColor,
+        bgColor: config.bgColor,
+      };
+    })
+    .filter((method) => method.amount > 0) // Only show methods with amounts
+    .sort((a, b) => {
+      // Put unpaid first, then sort others by amount descending
+      if (a.key === "unpaid") return -1;
+      if (b.key === "unpaid") return 1;
+      return b.amount - a.amount;
+    });
+});
 
 async function fetchSalesStatistics() {
   try {
-    const response = await api.get("/api/getSalesStatistics");
+    if (!salesDateRange.value) {
+      salesDateRange.value = {
+        from: new Date().toISOString().split("T")[0],
+        to: new Date().toISOString().split("T")[0],
+      };
+    }
+    const response = await api.get("/api/getSalesStatistics", {
+      params: {
+        start_date: salesDateRange.value.from, // Format as YYYY-MM-DD
+        end_date: salesDateRange.value.to, // Format as YYYY-MM-DD
+      },
+    });
 
     if (response.data) {
-      saleAnalytics.value = response.data || [];
-      console.log("Today's statistics:", saleAnalytics.value);
+      salesData.value = {
+        sales: response.data.sales || {
+          service: {
+            sales_qty: 0,
+            pricing_fees: 0,
+            receivable_fees: 0,
+            payments_collected: 0,
+          },
+          no_show: {
+            sales_qty: 0,
+            pricing_fees: 0,
+            receivable_fees: 0,
+            payments_collected: 0,
+          },
+          cancelled: {
+            sales_qty: 0,
+            pricing_fees: 0,
+            receivable_fees: 0,
+            payments_collected: 0,
+          },
+        },
+        amountGroupedByPaymentMethod: response.data
+          .amountGroupedByPaymentMethod || {
+          unpaid: 0,
+          eft_pos: 0,
+          cash: 0,
+        },
+        servicesMismatch: response.data.servicesMismatch || [],
+      };
+      console.log("Sales statistics:", salesData.value);
     }
   } catch (error) {
-    console.error("Error fetching today's statistics:", error);
+    console.error("Error fetching sales statistics:", error);
   }
 }
+
+// Navigation function for appointment details
+const viewAppointmentDetail = (appointmentId) => {
+  router.push({
+    path: "/admin/appointment/detail",
+    query: { id: appointmentId },
+  });
+};
 </script>
 
 <style scoped>

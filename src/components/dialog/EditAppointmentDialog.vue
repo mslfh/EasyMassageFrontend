@@ -37,6 +37,22 @@
               <q-item
                 clickable
                 v-close-popup
+                @click="
+                 router.push({
+                  path: '/admin/appointment/detail',
+                  query: { id: editEventForm.appointment_id },
+                })"
+                class="text-blue-5"
+              >
+                <q-item-label class="q-ma-sm">
+                  <q-icon size="17px" name="visibility" />
+                     DETAIL
+                </q-item-label>
+              </q-item>
+
+              <q-item
+                clickable
+                v-close-popup
                 @click="emit('openSms')"
                 class="text-teal-5"
               >
@@ -462,6 +478,7 @@
 import { ref, defineProps, onMounted, defineEmits } from "vue";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
+import { useRouter } from "vue-router";
 import { fetchUserFromSearch } from "../../composables/useUserFromSearch";
 import { fetchAvailableBookingTimeSlots } from "../../composables/useAvailableBookingTime";
 import CustomerHistoryTimeline from "components/CustomerHistoryTimeline.vue";
@@ -469,6 +486,7 @@ import ConfidentialClientCard from "components/ConfidentialClientCard.vue";
 import CustomerProfileCard from "components/CustomerProfileCard.vue";
 import ProfileAttachmentDialog from "components/dialog/ProfileAttachmentDialog.vue";
 
+const router = useRouter();
 const props = defineProps({
   editEventForm: {
     type: Object,
