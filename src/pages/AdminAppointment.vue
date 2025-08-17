@@ -496,6 +496,7 @@
     @close="showSendSmsDialog = false"
   />
 
+  <!-- Edit Staff Schedule Dialog -->
   <EditStaffScheduleDialog
     v-if="showScheduleStaffDialog.visible && isAdminOrDeskRole"
     :staffSchedule="showScheduleStaffDialog.staffSchedule"
@@ -599,7 +600,8 @@ onMounted(() => {
   }, 60000);
   setInterval(() => {
     scrollToNow();
-  }, 1800000); // 每半小时（1800000毫秒）scrollToNow
+  }, 1800000);
+  // 每半小时（1800000毫秒）scrollToNow
   console.log("currentUser", currentUser.value);
 });
 

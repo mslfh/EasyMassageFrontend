@@ -37,16 +37,12 @@
               <q-item
                 clickable
                 v-close-popup
-                @click="
-                 router.push({
-                  path: '/admin/appointment/detail',
-                  query: { id: editEventForm.appointment_id },
-                })"
+                @click="isLogDialogOpen = true"
                 class="text-blue-5"
               >
                 <q-item-label class="q-ma-sm">
                   <q-icon size="17px" name="visibility" />
-                     DETAIL
+                     LOG
                 </q-item-label>
               </q-item>
 
@@ -472,6 +468,13 @@
     "
     @close="isAttachmentDialogOpen = false"
   />
+
+  <!-- Appointment Logs -->
+  <LogDialog
+    v-model="isLogDialogOpen"
+    :appointment-id="editEventForm.appointment_id"
+    @close="isLogDialogOpen = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -485,6 +488,7 @@ import CustomerHistoryTimeline from "components/CustomerHistoryTimeline.vue";
 import ConfidentialClientCard from "components/ConfidentialClientCard.vue";
 import CustomerProfileCard from "components/CustomerProfileCard.vue";
 import ProfileAttachmentDialog from "components/dialog/ProfileAttachmentDialog.vue";
+import LogDialog from "components/dialog/LogDialog.vue";
 
 const router = useRouter();
 const props = defineProps({
@@ -769,4 +773,6 @@ const isHistoryDialogOpen = ref(false);
 const isProfileDialogOpen = ref(false);
 
 const isAttachmentDialogOpen = ref(false);
+
+const isLogDialogOpen = ref(false);
 </script>
