@@ -433,7 +433,7 @@
 
   <!-- Edit Event Dialog -->
   <EditAppointmentDialog
-    v-if="showEditEventDialog && isAdminOrDeskRole"
+    v-if="showEditEventDialog"
     :editEventForm="editEventForm"
     :selectedStaff="selectedStaff"
     :selectedDate="selectedDate"
