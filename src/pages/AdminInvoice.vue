@@ -46,10 +46,13 @@
         >
           <div class="row justify-between">
             <div>{{ service.service_title }}</div>
-            <div style="text-align: right">${{ service.service_price }}</div>
+            <div style="text-align: right">${{ order.total_amount }}</div>
           </div>
           <div class="text-caption text-grey">
             {{ formattedDate(service.booking_time) }}
+          </div>
+          <div class="text-caption text-grey">
+           Actual Duration: {{ service.service_duration }} min
           </div>
 
           <q-separator v-if="index < order.appointment.services.length - 1" />

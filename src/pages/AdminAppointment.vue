@@ -314,6 +314,10 @@
                       }}
                     </q-item-label>
 
+                     <q-item-label v-if="event.status == 'finished'">
+                       * Received Amount: ${{ event.effective_price }}
+                      </q-item-label>
+
                     <!-- Action Buttons -->
                     <div v-if="isAdminOrDeskRole">
                     <q-chip
@@ -699,6 +703,7 @@ async function fetchAppointments() {
       service_title: bookedService.service_title,
       service_duration: bookedService.service_duration,
       service_price: bookedService.service_price,
+      effective_price: bookedService.effective_price,
       comments: bookedService.comments,
       date: selectedDate.value,
       time: bookedService.booking_time.slice(11, 16),
