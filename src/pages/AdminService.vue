@@ -34,6 +34,11 @@
             emit-value
             map-options
           />
+          <q-toggle
+            v-model="addForm.is_viewable"
+            label="Open to Customers"
+            color="green"
+          />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
@@ -68,6 +73,13 @@
         <q-td class="text-center">
         <q-badge :color="props.row.status === 'active' ? 'green' : 'red'">
           {{ props.row.status }}
+        </q-badge>
+      </q-td>
+      </template>
+      <template v-slot:body-cell-is_viewable="props">
+        <q-td class="text-center">
+        <q-badge :color="props.row.is_viewable ? 'green' : 'red'">
+          {{ props.row.is_viewable ? 'Yes' : 'No' }}
         </q-badge>
       </q-td>
       </template>
@@ -124,6 +136,11 @@
             :options="statusOptions"
             emit-value
             map-options
+          />
+          <q-toggle
+            v-model="editForm.is_viewable"
+            label="Open to Customers"
+            color="green"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -190,7 +207,8 @@ const columns = [
     field: "duration",
   },
   { name: "price", label: "Price ($)", align: "left", field: "price" },
-  { name: "status", label: "Status", align: "left", field: "status" },
+  { name: "status", label: "Status", align: "center", field: "status" },
+  { name: "is_viewable", label: "Viewable", align: "center", field: "is_viewable" },
   { name: "actions", label: "Actions", align: "center" },
 ];
 
@@ -220,6 +238,7 @@ const addForm = ref({
   duration: null,
   price: null,
   status: "",
+  is_viewable: true,
 });
 
 const openAddServiceDialog = () => {
@@ -230,6 +249,7 @@ const openAddServiceDialog = () => {
     duration: null,
     price: null,
     status: "",
+    is_viewable: true,
   };
   isAddDialogOpen.value = true;
 };
@@ -253,6 +273,7 @@ const editForm = ref({
   duration: null,
   price: null,
   status: "",
+  is_viewable: true,
 });
 
 const editService = (row) => {
