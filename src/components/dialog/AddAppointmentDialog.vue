@@ -584,6 +584,33 @@ async function addAppointment() {
       return;
     }
 
+    // Check if booking time is within business hours (8:00 AM to 8:00 PM)
+    const bookingTime = addAppointmentForm.value.booking_time;
+    const [hours, minutes] = bookingTime.split(':').map(Number);
+    const bookingTimeInMinutes = hours * 60 + minutes;
+    const businessStartTime = 8 * 60; // 8:00 AM in minutes
+    const businessEndTime = 20 * 60; // 8:00 PM in minutes
+
+    if (bookingTimeInMinutes < businessStartTime || bookingTimeInMinutes >= businessEndTime) {
+      const confirmed = await new Promise((resolve) => {
+        $q.dialog({
+          title: '<span class="text-negative"> Booking Time Outside Business Hours!</span>',
+          message: `Booking time ${bookingTime} is outside business hours. Continue adding?`,
+          html: true,
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          resolve(true);
+        }).onCancel(() => {
+          resolve(false);
+        });
+      });
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
     if (addAppointmentForm.value.customer_service[0]["customer_name"] === "") {
       $q.notify({
         type: "info",
