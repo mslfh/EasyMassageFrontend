@@ -23,13 +23,26 @@
           <q-input
             class="col-6"
             v-model="schedule.work_date"
+            readonly
             type="date"
             label="Date"
             outlined
           />
         </div>
-        <q-input v-model="schedule.start_time" type="time" label="Start Time" />
-        <q-input v-model="schedule.end_time" type="time" label="End Time" />
+        <q-input
+          v-model="schedule.start_time"
+          type="time"
+          label="Start Time"
+          :error="startTimeError.hasError"
+          :error-message="startTimeError.message"
+        />
+        <q-input
+          v-model="schedule.end_time"
+          type="time"
+          label="End Time"
+          :error="endTimeError.hasError"
+          :error-message="endTimeError.message"
+        />
         <!-- <q-option-group
           v-model="schedule.status"
           label="Status"
@@ -41,7 +54,25 @@
         /> -->
         <q-input v-model="schedule.remark" label="Remark" />
       </q-card-section>
-      <q-card-section class="items-center q-pb-none text-grey text-subtitle1">
+      <!-- Time Restrictions Configuration - Only for Admin/Desk -->
+      <q-card-section
+        v-if="isAdminOrDeskRole"
+        class="q-pt-none"
+      >
+        <q-toggle
+          v-model="timeRestrictionsEnabled"
+          label="Enable time restrictions for staff"
+          color="primary"
+          @update:model-value="emit('update-time-restrictions', timeRestrictionsEnabled)"
+        />
+        <div class="text-caption text-grey-6 q-mt-xs">
+          When enabled, staff can only advance start time and extend end time
+        </div>
+      </q-card-section>
+      <q-card-section
+        v-if="isAdminOrDeskRole"
+        class="items-center q-pb-none text-grey text-subtitle1"
+      >
         <div class="text-bold">
           <q-icon name="group" size="sm" class="q-mr-md" />Staff Filter
         </div>
@@ -65,12 +96,13 @@
         />
         <q-btn
           flat
-          label="Comfirm"
+          label="Confirm"
           color="primary"
+          :disable="hasValidationErrors"
           @click="
             () => {
               editScheduleStaffDialog = false;
-              if (showAllStaff != props.isShowAllStaff) {
+              if (isAdminOrDeskRole && showAllStaff != props.isShowAllStaff) {
                 updateSchedule();
                 emit('switch-show-staff');
               } else {
@@ -88,6 +120,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useQuasar } from "quasar";
 import { api } from "boot/axios";
+import { canAccessAllMenus } from "../../utils/auth";
 
 const props = defineProps({
   staffSchedule: {
@@ -98,22 +131,81 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  enableTimeRestrictions: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const $q = useQuasar();
 
 const schedule = ref([]);
+const isAdminOrDeskRole = ref(false);
+const originalSchedule = ref({});
+const timeRestrictionsEnabled = ref(props.enableTimeRestrictions);
 
-const emit = defineEmits(["close", "switch-show-staff"]);
+const emit = defineEmits(["close", "switch-show-staff", "update-time-restrictions"]);
 
 const editScheduleStaffDialog = ref(true);
 const showAllStaff = ref(props.isShowAllStaff);
 
 onMounted(() => {
   schedule.value = props.staffSchedule.schedule[0] || {};
+  originalSchedule.value = { ...schedule.value };
+  isAdminOrDeskRole.value = canAccessAllMenus();
+});
+
+// 开始时间验证计算属性
+const startTimeError = computed(() => {
+  // 如果禁用时间限制，或者是管理员/前台角色，则不进行验证
+  if (!timeRestrictionsEnabled.value || isAdminOrDeskRole.value) {
+    return { hasError: false, message: '' };
+  }
+
+  const originalStartTime = originalSchedule.value.start_time;
+  const newStartTime = schedule.value.start_time;
+
+  if (originalStartTime && newStartTime && newStartTime > originalStartTime) {
+    return {
+      hasError: true,
+      message: 'Start time cannot be delayed by staff account. Please contact an administrator.'
+    };
+  }
+
+  return { hasError: false, message: '' };
+});
+
+// 结束时间验证计算属性
+const endTimeError = computed(() => {
+  // 如果禁用时间限制，或者是管理员/前台角色，则不进行验证
+  if (!timeRestrictionsEnabled.value || isAdminOrDeskRole.value) {
+    return { hasError: false, message: '' };
+  }
+
+  const originalEndTime = originalSchedule.value.end_time;
+  const newEndTime = schedule.value.end_time;
+
+  if (originalEndTime && newEndTime && newEndTime < originalEndTime) {
+    return {
+      hasError: true,
+      message: 'End time cannot be shortened by staff account. Please contact an administrator.'
+    };
+  }
+
+  return { hasError: false, message: '' };
+});
+
+// 检查是否有任何验证错误
+const hasValidationErrors = computed(() => {
+  return startTimeError.value.hasError || endTimeError.value.hasError;
 });
 
 async function updateSchedule() {
+  // 如果有验证错误，不执行更新
+  if (hasValidationErrors.value) {
+    return;
+  }
+
   try {
     const { id, start_time, end_time,status, remark } = schedule.value;
     if (id) {

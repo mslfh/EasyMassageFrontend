@@ -502,7 +502,7 @@
 
   <!-- Edit Staff Schedule Dialog -->
   <EditStaffScheduleDialog
-    v-if="showScheduleStaffDialog.visible && isAdminOrDeskRole"
+    v-if="showScheduleStaffDialog.visible"
     :staffSchedule="showScheduleStaffDialog.staffSchedule"
     :isShowAllStaff="isShowAllStaff"
     @close="
